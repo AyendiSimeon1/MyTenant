@@ -1,45 +1,35 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const {
  getUserByEmail, checkUserEmailExists,
 } = require('../crud/auth.crud');
-const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient();
+const secretKey = 'admin';
 
-const authMiddleware = () => {
-  passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  }, async (email, password, done) => {
-    try {
-      const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) {
-        return done(null, false, { message: 'Incorrect email or password' });
-      }
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return done(null, false, { message: 'Incorrect email or password' });
-      }
-      return done(null, user);
-    } catch (error) {
-      return done(error);
-    }
-  }));
-
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await prisma.user.findUnique({ where: { id } });
-      done(null, user);
-    } catch (error) {
-      done(error);
-    }
-  });
+const generateToken = (user) => {
+  const  token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+  return token;
 };
 
-module.exports = { authMiddleware };
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  console.log(token);
+
+  if(!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  jwt.verify(token.split(' ')[1], 'admin', (err, decoded) =>{
+    if(err) {
+      console.error(err);
+      return res.status(403).json({ message: 'Failed to authenticate user' });
+    }
+    req.user = decoded;
+    next();
+  });
+  
+};
+
+module.exports = { verifyToken, generateToken };

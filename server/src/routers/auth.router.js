@@ -1,26 +1,26 @@
 const express = require('express');
 const passport = require('passport');
 const  {
-  authMiddleware,
+  authMiddleware, verifyToken, 
 } = require('../middlewares/auth.middlewares');
 const {
   registerController,
   loginController,
   passwordResetController,
+  resetPasswordController
 
 } = require("../controllers/auth.controllers");
 
+const secretKey = 'admin';
 
 const authRouter = express.Router();
 
-
-
 authRouter.post('/signup', registerController);
 
-authRouter.post('/login', authMiddleware(), loginController);
+authRouter.post('/login', verifyToken, loginController);
 
-authRouter.post('/request-password-reset', passwordResetController);
+authRouter.post('/request-password-reset',  passwordResetController);
 
-// router.post('/reset-password', resetPassword);
+authRouter.post('/reset-password/:token', resetPasswordController);
 
 module.exports = { authRouter };
