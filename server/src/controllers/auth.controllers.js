@@ -82,7 +82,7 @@ const loginController = async (req, res, next) => {
 };
 
 const passwordResetController = async (req, res) => {
-  const { email } = req.body;
+  const { email, phoneNumber } = req.body;
   try {
     const checkEmail = await checkUserEmailExists(email);
 
@@ -90,12 +90,19 @@ const passwordResetController = async (req, res) => {
       return res.status(404).json('User does not exist');
     }
     const token = createResetToken(email);
+
+    const toPhoneNumber = '+1234567890';
     
-    const sendTokenToMail =  await sendResetEmail();
+
+    const resetToken = async () => { 
+      const sentToken = await sendResetSms(toPhoneNumber, token)
+
+      if(!sentToken) {
+        res.status(401).json({ message: 'Failed to send token through sms'});
+      }
+      
+      return res.status.(200).json({ message: 'Token sent to phone number' });
     
-  
-    if(!sendTokenToMail){
-      return res.status(402).json({ message: 'Unable to send token to mail'})
     }
 
     return res.status(200).json({ message: 'Password reset token sent to mail' });

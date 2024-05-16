@@ -1,38 +1,26 @@
-const nodemailer = require('nodemailer');
-const { Oauth2Client } = require('google-auth-library');
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+const twilio = require('twilio');
+const dotenv = require('dotenv');
 
+// Load environment variables from .env file
+dotenv.config();
 
-const sendResetEmail = async () => {
-  const oauth = new Oauth2Client(clientId, clientSecret);
-  oauth.setCredentials({ refresh_token: refreshToken });
-  const accessToken = await oauth.getAccessToken();
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = new twilio(accountSid, authToken);
 
-  const transporter = nodemailer.createTransport({
-    host: smtp.gmail.com,
-    port: 465,
-    secure: true,
-    auth: {
-      type: 'Oauth2',
-      user: 'ayendisimeon3@gmail.com',
-      clientId,
-      clientSecret,
-      refreshToken,
-      accessToken
-    },
-  })
+const sendResetSms = async (toPhoneNumber, token) => {
+  try {
+    const message = await client.messages.create({
+      body: `To reset your password, click on the following link: http://localhost:3000/reset-password?token=${token}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: toPhoneNumber,
+    });
+    console.log('SMS sent:', message.sid);
+    return message;
+  } catch (error) {
+    console.error('Error sending SMS:', error);
+    throw error;
+  }
+};
 
-  const mailOptions = {
-    from: 'konsizeinc@gmail.com',
-    to: 'mrayendi1@gmail.com',
-    subject: 'Password Reset',
-    text: `To reset your password, click on the following link: http://localhost:3000/reset-password?token=${token}`,
-  };
-
-  const sentMail = await transporter.sendMail(mailOptions);
-  return sentMail;
-}
-
-module.exports = { sendResetEmail };
+module.exports = { sendResetSms };

@@ -15,7 +15,8 @@ model User {
   firstName      String
   lastName       String
   role           Role
-  agencyName     String?  
+  agencyId       Int?
+  agency?        Agency?  @relation(fields: [agencyId], references:[id])  
   agencyDetails  Json?    
   occupation     String?  
   previousRent   String?  
@@ -28,6 +29,17 @@ model User {
 enum Role {
   AGENT
   TENANT
+}
+
+model Agency {
+  id            Int       @id @default(autoincrement())
+  name          String    
+  logo          String?    
+  address       String?   
+  city          String?    
+  state         String?   
+  country       String? 
+  postalCode    String?    
 }
 
 model Form {
