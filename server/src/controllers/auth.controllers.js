@@ -24,9 +24,7 @@ const registerController = async (req, res) => {
     agencyDetails,
     occupation,
     resetToken,
-
   } = req.body
-
 
   try {
     const existingUser = checkUserEmailExists(email);
@@ -56,14 +54,11 @@ const registerController = async (req, res) => {
   } catch (error) {
     console.error({'Error creating user': error});
     return res.status(500).json({ error: 'Internal server error'});
-  }
-
-  
+  } 
 };
 
 const loginController = async (req, res, next) => {
   const { email, password } = req.body;
-
   try {
     const user = checkUserEmailExists(email);
     if(!user) {
@@ -110,7 +105,6 @@ const resetPasswordController = async (req, res) => {
   const { newPassword } = req.body;
 
   try {
-
     const tokenVerification = await confirmToken(token);
 
     if(!tokenVerification){
@@ -126,9 +120,6 @@ const resetPasswordController = async (req, res) => {
   } catch (error) {
       console.error(error);
     }
-
-  
-
 };
 
 module.exports = { registerController, loginController, passwordResetController, resetPasswordController, resetPasswordController } 

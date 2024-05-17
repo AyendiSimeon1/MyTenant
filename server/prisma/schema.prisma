@@ -39,12 +39,12 @@ model Agency {
   address       String?   
   city          String?    
   state         String?   
-  country       String? 
-    
+  country       String?    
 }
 
 model Form {
   id         Int      @id @default(autoincrement())
+  formId      String   @unique
   agent      User     @relation(fields: [agentId], references: [id])
   agentId    Int
   createdAt   DateTime @default(now())
