@@ -12,7 +12,6 @@ const generateToken = (user) => {
   const  token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
   return token;
 };
-
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
   console.log(token);

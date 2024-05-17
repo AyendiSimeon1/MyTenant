@@ -17,12 +17,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", mainRouter);
-const PORT = 3000;
+const PORT = 3001;
 
 const start = async () => {
   try {
     console.log("Connecting to database...");
-    // await connectDB(config.NODE_ENV === "development" ? config.DATABASE_URL : config.DATABASE_URL);
     server.listen(PORT, () => {
         console.log(`App is running on http://127.0.0.1:${PORT}`);
     });
@@ -30,7 +29,5 @@ const start = async () => {
     console.log(error);
   }
 };
-
-console.log(process.env.DATABASE_URL);
 
 start();

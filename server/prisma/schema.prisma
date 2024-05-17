@@ -15,70 +15,49 @@ model User {
   firstName      String
   lastName       String
   role           Role
-  agencyId       Int?
-  agency?        Agency?  @relation(fields: [agencyId], references:[id])  
   agencyDetails  Json?    
   occupation     String?  
   previousRent   String?  
-  resetToken     String?  
+  resetToken     String?  @unique 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   forms          Form[]   
 }
 
+
 enum Role {
   AGENT
   TENANT
+  ADMIN
 }
 
 model Agency {
   id            Int       @id @default(autoincrement())
-  name          String    
+  name          String
+  email         String    
   logo          String?    
   address       String?   
   city          String?    
   state         String?   
   country       String? 
-  postalCode    String?    
+    
 }
 
 model Form {
   id         Int      @id @default(autoincrement())
   agent      User     @relation(fields: [agentId], references: [id])
   agentId    Int
-  name       String
-  description String?
-  content    Json
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  applications Application[] // Reverse relation: one form can have multiple applications
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agencyLogo  String? 
+  agentName   String  
+  agentEmail  String  
+  tenantName  String?
+  tenantEmail String?  
+  tenantPhone String?
+  propertyAddress String? 
+  leaseStartDate DateTime? 
+  leaseEndDate DateTime?  
+  fields      Json
 }
 
-model Application {
-  id                  Int           @id @default(autoincrement())
-  form                Form          @relation(fields: [formId], references: [id])
-  formId              Int
-  tenantName          String
-  tenantEmail         String
-  phoneNumber         String // Assuming phone number is a string
-  propertyDetails     Json?
-  status              String       @default("Pending") // Providing default value
-  submittedAt         DateTime     @default(now())
-  additionalDocuments Json?
-  referenceDetails    Json?
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-  references          Reference[]  // Reverse relation: one application can have multiple references
-}
-
-model Reference {
-  id                    Int         @id @default(autoincrement())
-  application           Application @relation(fields: [applicationId], references: [id])
-  applicationId         Int
-  name                  String
-  occupation            String
-  relationshipToTenant String
-  contactInformation    Json
-  referenceId           String?     // Assuming referenceId is a string or UUID
-  verified              Boolean     @default(false)
-}

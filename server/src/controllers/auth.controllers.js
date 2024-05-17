@@ -3,8 +3,14 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { verifyToken, generateToken } = require('../middlewares/auth.middlewares');
 require('dotenv').config();
-const { createUser, checkUserEmailExists, getHashedPassword, createResetToken, updateUserData } = require('../crud/auth.crud');
-const { sendResetEmail } = require('../utils/emails');
+const { createUser, 
+        checkUserEmailExists, 
+        getHashedPassword, 
+        createResetToken, 
+        updateUserData, 
+        confirmToken 
+      } = require('../crud/auth.crud');
+const { sendResetSms } = require('../utils/emails');
 const secretKey = 'admin';
 
 const registerController = async (req, res) => {
@@ -62,16 +68,13 @@ const loginController = async (req, res, next) => {
     const user = checkUserEmailExists(email);
     if(!user) {
       return res.status(404).json({ message: 'User not found' });
-    }
-    
+    } 
     const hashedPassword = await getHashedPassword(email);
-    console.log('Retrieved hashed password:', hashedPassword);
     const verifyPassword = await bcrypt.compare(password, hashedPassword);
 
     if(!verifyPassword) {
       return res.status(401).json({ message: 'Invalid password' });
     }
-
     const token = jwt.sign({ id:user.id, email: user.email}, 'admin', { expiresIn: '4h'});
     res.json({ token });
   } catch (error) {
@@ -89,47 +92,37 @@ const passwordResetController = async (req, res) => {
     if(!checkEmail){
       return res.status(404).json('User does not exist');
     }
-    const token = createResetToken(email);
-
-    const toPhoneNumber = '+1234567890';
-    
-
-    const resetToken = async () => { 
-      const sentToken = await sendResetSms(toPhoneNumber, token)
-
-      if(!sentToken) {
-        res.status(401).json({ message: 'Failed to send token through sms'});
-      }
-      
-      return res.status.(200).json({ message: 'Token sent to phone number' });
-    
+    const token = await createResetToken(email);
+    console.log(token);
+    const sentToken = await sendResetSms(phoneNumber, token)
+    if(!sentToken) {
+      res.status(401).json({ message: 'Failed to send token through sms'});
     }
-
-    return res.status(200).json({ message: 'Password reset token sent to mail' });
+    return res.status(200).json({ message: 'Token sent to phone number' });
+    
   } catch (error) {
     console.error(error);
   }
 };
 
-const resetPasswordController = async () => {
-  const token = request.params;
+const resetPasswordController = async (req, res) => {
+  const token = req.params;
   const { newPassword } = req.body;
 
   try {
-    const user = prisma.User.findFirst({
-      where: {
-        resetToken: token
-      }
-      });
 
-      if(!user){
-        return res.status(404).json({ message: 'User not found' });
+    const tokenVerification = await confirmToken(token);
+
+    if(!tokenVerification){
+      return res.status(404).json({ message: 'Wrong or expired token' });
     };
 
     const updatePassword = await updateUserData(newPassword);
     if(!updatePassword) {
       return res.status(401).json({ error: 'Passport update failed'});
     }
+
+    res.status(200).json({ message: 'You have successfuly updated your password' });
   } catch (error) {
       console.error(error);
     }
