@@ -39,7 +39,7 @@ const createForm = async (formData) => {
 
 const getForm = async (formId) => {
     try {
-        const form = await prisma.form.findUnique({
+        const form = await prisma.Form.findUnique({
           where: {
             formId,
           },
@@ -55,4 +55,30 @@ const getForm = async (formId) => {
       }
 }
 
-module.exports = { createForm, getForm };
+const responseForm = async (formId, formData) =>{
+    const { response } = formData;
+    try {
+        
+        const form = await prisma.Form.findUnique({
+            where: {
+            formId,
+            },
+        });
+        if (!form) {
+            return res.status(404).json({ error: 'Form not found' });
+        }
+        const formResponse = await prisma.FormResponse.create({
+            data: {
+            formId: form.id,
+            response: response,
+            },
+        });
+        return formResponse;
+
+   
+    } catch (error){
+        console.error(error);
+    }
+};
+
+module.exports = { createForm, getForm, responseForm };

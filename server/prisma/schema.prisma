@@ -59,5 +59,14 @@ model Form {
   leaseStartDate DateTime? 
   leaseEndDate DateTime?  
   fields      Json
+  responses    FormResponse[]
+}
+
+model FormResponse {
+  id        Int      @id @default(autoincrement())
+  formId    Int
+  form      Form     @relation(fields: [formId], references: [id])
+  response  Json
+  createdAt DateTime @default(now())
 }
 
