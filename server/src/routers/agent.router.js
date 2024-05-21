@@ -4,7 +4,8 @@ const {
     createFormController, 
     getAllApplications, 
     getApplicationByIdController,
-    updateApplication
+    updateApplication,
+    generateLink
  } = require('../controllers/agent.controllers');
 
 const  agentRouter = express.Router();
@@ -16,5 +17,7 @@ agentRouter.get("/application/:id", getApplicationByIdController);
 agentRouter.get("/applications/:agendId", getAllApplications);
 
 agentRouter.post("/applications/update/:agentId/:id", updateApplication);
+
+agentRouter.get("/generate-link/:applicationId", generateLink);
 
 module.exports = { agentRouter }

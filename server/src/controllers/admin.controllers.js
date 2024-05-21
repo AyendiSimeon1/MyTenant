@@ -1,6 +1,5 @@
-const { application } = require('express');
-const { getForm } = require('../crud/forms.crud');
-const { getAgentForms } = require('../crud/user.crud');
+
+const { getApplications, getSuccessfulTenanciesReport } = require('../crud/admin.crud');
 
 
 const generateReportsController = async (req, res) => {
@@ -42,10 +41,12 @@ const monitorFormAndPayments = async (req, res) => {
 const viewAndManageApplications = async (req, res) => {
     const { sort, filter } = req.body;
     try {
-        const applications = await getApplications(sort, filter);
-        res.json(applications);
+        const applications = await getApplications(sort);
+        const succesfullApplications = await getSuccessfulTenanciesReport()
+        res.json({ message: applications, succesfullApplications });
     } catch (error) {
-        res.status(500).json({ message: 'Server Error', error: error.message });
+      console.log(error);
+      res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 const reviewReferenceDetails = async (req, res) => {
@@ -74,4 +75,4 @@ const approveOrRejectApplication = async (req, res) => {
 };
 
 
-module.exports = { agentDashboard, agentFormsControllers };
+module.exports = { viewAndManageApplications, approveOrRejectApplication };

@@ -54,6 +54,15 @@ model Application {
   leaseStartDate  DateTime?
   leaseEndDate    DateTime?
   fields          Json
+  uniqueLink      String?
+  submissions     SubmittedApplication[] @relation("ApplicationSubmissions")
+}
+
+model SubmittedApplication {
+  id              String      @id @default(uuid())
+  applicationId   String
+  application     Application @relation(fields: [applicationId], references: [id], name: "ApplicationSubmissions")
+  fields          Json
 }
 
 model Payment {

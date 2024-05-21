@@ -11,11 +11,11 @@ const getUserEngagementReport = async () => {
     });
   };
   
-  const getSuccessfulTenanciesReport = async () => {
-    return await prisma.application.findMany({
-      where: { status: 'approved' },
-    });
-  };
+const getSuccessfulTenanciesReport = async () => {
+  return await prisma.application.findMany({
+    where: { status: 'approved' },
+   });
+};
   
   const getPaymentTransactionReport = async () => {
     return await prisma.payment.findMany();
@@ -29,11 +29,9 @@ const getPayments = async () => {
     return await prisma.payment.findMany({ orderBy: { createdAt: 'desc' } });
 };
 
-const getApplications = async (sort, filter) => {
-    return await prisma.form.findMany({
-        where: filter || {},
-        orderBy: sort || { createdAt: 'desc' },
-        include: { user: true, references: true }
+const getApplications = async () => {
+    return await prisma.application.findMany({
+        orderBy: { createdAt: 'desc' }
     });
 };
 
@@ -55,4 +53,6 @@ const updateApplicationStatus = async (applicationId, status) => {
 module.exports = {
     getForms,
     getPayments,
+    getApplications,
+    getSuccessfulTenanciesReport
 };

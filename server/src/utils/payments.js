@@ -1,44 +1,59 @@
-const paystack = require('paystack')(process.env.PAYSTACK_SECRET_KEY);
+// const express = require('express');
+// const router = express.Router();
+// const paystack = require('../utils/paystack');
 
-// Handle payment creation
-const initiatePayment = async (req, res) => {
-  const { amount, email, reference } = req.body;
+// // Route to initialize a Paystack transaction
+// router.post('/initialize', async (req, res) => {
+//   try {
+//     const { amount, email, plan = 'default' } = req.body; // Extract payment details
 
-  try {
-    const payment = await paystack.initializeTransaction({
-      amount: amount * 100, // Paystack requires amount in kobo
-      email,
-      reference,
-      callback_url: 'https://yourwebsite.com/payment/callback', // Redirect URL after payment
-    });
-    
-    res.json(payment);
-  } catch (error) {
-    console.error('Payment initiation failed:', error);
-    res.status(500).json({ message: 'Payment initiation failed' });
-  }
-};
+//     // Calculate agent and admin shares based on your split logic
+//     const agentShare = amount * 0.6; // Adjust this percentage as needed
+//     const adminShare = amount - agentShare;
 
-// Handle payment verification
-const verifyPayment = async (req, res) => {
-  const { reference } = req.query;
+//     const body = {
+//       email,
+//       amount: Math.round(agentShare * 100), // Convert to kobo for Paystack
+//       plan, // Optional plan for recurring payments
+//       metadata: {
+//         // Optional metadata to store additional information
+//         tenantId: req.body.tenantId, // Example: Store tenant ID for reference
+//       },
+//     };
 
-  try {
-    const transaction = await paystack.verifyTransaction({ reference });
-    
-    if (transaction.status === 'success') {
-      // Payment successful, update database or trigger next steps
-      res.json({ message: 'Payment successful', transaction });
-    } else {
-      res.status(400).json({ message: 'Payment not successful', transaction });
-    }
-  } catch (error) {
-    console.error('Payment verification failed:', error);
-    res.status(500).json({ message: 'Payment verification failed' });
-  }
-};
+//     const response = await paystack.initializeTransaction(body);
 
-module.exports = {
-  initiatePayment,
-  verifyPayment,
-};
+//     if (response.status) {
+//       res.status(200).json({
+//         data: response.data,
+//         message: response.message,
+//         status: response.status,
+//       });
+//     } else {
+//       res.status(response.status).json({
+//         error: response.message,
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Error initializing payment:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+// const Paystack = require('paystack')('your_test_secret_key'); // Replace with your secret key
+
+// exports.initializeTransaction = async (body) => {
+//   return new Promise((resolve, reject) => {
+//     Paystack.transactions.initialize(body, (error, response) => {
+//       if (error) {
+//         reject(error);
+//       } else {
+//         resolve(response);
+//       }
+//     });
+//   });
+// };
+
+// // ... (Optional: Add verifyTransaction function if needed)
+
+
+// module.exports = router;

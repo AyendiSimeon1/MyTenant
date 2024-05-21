@@ -1,13 +1,19 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient;
+
 const getTenantById = async (id) => {
     return await prisma.user.findUnique({ where: { id } });
   };
 
-  const createApplication = async (data) => {
-    return await prisma.application.create({
-      data,
+  const submitApplication = async (applicationId, submissionData) => {
+    return await prisma.submittedApplication.create({
+      data: {
+        ...submissionData,
+        applicationId,
+      },
     });
   };
-
+  
   const updateApplicationIdDocument = async (tenantId, idDocument) => {
     return await prisma.application.update({
       where: { tenantId },
@@ -31,3 +37,4 @@ const getTenantById = async (id) => {
     });
   };
   
+  module.exports = { submitApplication, getTenantById }

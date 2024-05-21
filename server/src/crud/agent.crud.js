@@ -41,28 +41,31 @@ const getAllApplication = async (agentId)  =>{
   })
 };
 
-const updateApplications = async (agentId, id, title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields ) => {
-  return await prisma.Application.update({
-      where : {  agentId, id },
-      data: { 
-        title,
-        logoUrl,
-        status,
-        propertyAddress,
-        leaseStartDate,
-        leaseEndDate,
-        fields: JSON.stringify(fields),
-      }
-  });
-}
-  const createFormLink = async (formId) => {
-    return await prisma.formLink.create({
-      data: {
-        formId,
-        url: `http://your-domain.com/forms/${formId}/fill`,
-      },
+const updateApplications = async (agentId, id, updateData) => {
+  try {
+    return await prisma.application.update({
+      where: { agentId, id },
+      data: updateData,
     });
-  };
+  } catch (error) {
+    throw new Error(`Update failed: ${error.message}`);
+  }
+};
+
+const createFormLink = async (applicationId) => {
+  try {
+    const uniqueLinkId = uuidv4().slice(0, 6);
+    const baseUrl = "127.0.0.1:3001/"
+    const uniqueLink = `${baseUrl}/applications/${uniqueLinkId}/`; 
+    const link = await prisma.application.update({
+      where : { id: applicationId },
+      data : { uniqueLink },
+    });
+    return link;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
   const getApplicationById = async (id, agentId) => {
     return await prisma.Application.findFirst({

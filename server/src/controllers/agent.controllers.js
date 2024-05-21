@@ -1,6 +1,11 @@
 const { PrismaClient } = require('@prisma/client');
 
-const { createForm, getAllApplication, updateApplications, updateApplicationStatus } = require('../crud/agent.crud');
+const { createForm, 
+        getAllApplication, 
+        updateApplications, 
+        updateApplicationStatus,
+        createFormLink 
+      } = require('../crud/agent.crud');
 const prisma =  new PrismaClient;
 
 const createFormController = async (req, res) => {
@@ -15,14 +20,14 @@ const createFormController = async (req, res) => {
   };
   
 
-  const createFormLinkController = async (req, res) => {
+  const generateLink = async (req, res) => {
     try {
-      const { id } = req.params;
-      const form = await prisma.form.findUnique({ where: { id: parseInt(id) } });
+      const { applicationId } = req.params;
   
-      if (!form || form.agentId !== req.user.id) return res.sendStatus(403);
-  
-      const formLink = await createFormLink(form.id);
+      const formLink = await createFormLink(applicationId);
+      if(!formLink) {
+        res.status(404).json({ message: 'Application not found' });
+      }
       res.json(formLink);
     } catch (error) {
       res.status(500).json({ error: 'Failed to create form link' });
@@ -42,24 +47,31 @@ const getAllApplications = async (req, res) => {
   }
 }
 const updateApplication = async (req, res) => {
-  
   try {
     const { agentId, id } = req.params;
-    console.log([agentId, id]);
-    const { title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields } = req.body;
+    const { title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields } = req.body;
 
-    
-    const updatedApplication = await updateApplications(agentId, id, title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields);
-    if(!updatedApplication) {
-      res.status(404).json({ message: 'Application not found' });
+    const updateData = {
+      title,
+      logoUrl,
+      status,
+      propertyAddress,
+      leaseStartDate,
+      leaseEndDate,
+      fields: JSON.stringify(fields),
+    };
 
+    const updatedApplication = await updateApplications(agentId, id, updateData);
+    if (!updatedApplication) {
+      return res.status(404).json({ message: 'Application not found' });
     }
-    return updatedApplication;
+
+    return res.status(200).json({ message: 'Application updated successfully' });  // Or just return a 200 status code
   } catch (error) {
     console.error(error);
-    res.status(500).json('Internal server error');
+    return res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
   const getApplicationByIdController = async (req, res) => {
     try {
@@ -106,4 +118,9 @@ const rejectApplicationController = async (req, res) => {
   }
 };
 
-module.exports = { createFormController, getApplicationByIdController, getAllApplications, updateApplication };
+module.exports = { createFormController, 
+                    getApplicationByIdController, 
+                    getAllApplications, 
+                    updateApplication,
+                    generateLink
+                  };
