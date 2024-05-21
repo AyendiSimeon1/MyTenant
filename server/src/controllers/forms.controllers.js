@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { ReferSip } = require('twilio/lib/twiml/VoiceResponse');
-const { createForm, getForm, responseForm } = require('../crud/forms.crud');
+const { createForm, getForm, responseForm, addRefrence } = require('../crud/forms.crud');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -36,10 +36,20 @@ const formResponseController = async (req, res) => {
     
 }
 
+const refrenceController = async (req, res) => {
+    try {
+        const formData = req.body;
 
+        const createReference = await addRefrence(formData);
+
+        res.status(201).json({ message: 'Reference created', createReference });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error'});
+    }
+
+};
       
-    
 
-
-module.exports = { createFormsControllers, getFormController, formResponseController }
+module.exports = { createFormsControllers, getFormController, formResponseController, refrenceController }
 

@@ -1,14 +1,14 @@
-import express from "express";
-import { validate } from "../middlewares/validate-input";
-import {
-  changePasswordController,
-} from "../controllers/user.controller";
+const express = require('express');
 
-const router = express.Router();
+const  {
+  // agentDashboard,
+  agentFormsControllers
+} = require("../controllers/user.controllers");
 
-router.post("/sign-in", validate(LoginInputSchema), loginController);
-router.post(
-  "/refresh-token",
-  validateRefreshTokenMiddleware,
-  refreshTokenController
-);
+const userRouter = express.Router();
+
+// userRouter.get("/agent-dashboard/:id/", agentDashboard);
+
+// userRouter.get("/agents/:agentId/forms", agentFormsControllers);
+
+module.exports = { userRouter };

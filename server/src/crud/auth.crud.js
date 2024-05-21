@@ -26,7 +26,7 @@ const createUser = async (userData) => {
       throw new Error('User with this email already exists');
     }
   
-    const user = await prisma.user.create({
+    const user = await prisma.User.create({
       data: userData
     });
     return user;

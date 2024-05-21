@@ -9,21 +9,23 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  email          String   @unique
-  password       String
-  firstName      String
-  lastName       String
-  role           Role
-  agencyDetails  Json?    
-  occupation     String?  
-  previousRent   String?  
-  resetToken     String?  @unique 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  forms          Form[]   
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role
+  agencyName   String?
+  agencyDetails Json?
+  occupation   String?
+  previousRent String?
+  resetToken   String        @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  forms        CustomForm[]  @relation("CreatedBy")
+  payments     Payment[]
+  applications Application[] @relation("CreatedApplications")
 }
-
 
 enum Role {
   AGENT
@@ -31,42 +33,36 @@ enum Role {
   ADMIN
 }
 
-model Agency {
-  id            Int       @id @default(autoincrement())
-  name          String
-  email         String    
-  logo          String?    
-  address       String?   
-  city          String?    
-  state         String?   
-  country       String?    
-}
-
-model Form {
-  id         Int      @id @default(autoincrement())
-  formId      String   @unique
-  agent      User     @relation(fields: [agentId], references: [id])
-  agentId    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  agencyLogo  String? 
-  agentName   String  
-  agentEmail  String  
-  tenantName  String?
-  tenantEmail String?  
-  tenantPhone String?
-  propertyAddress String? 
-  leaseStartDate DateTime? 
-  leaseEndDate DateTime?  
-  fields      Json
-  responses    FormResponse[]
-}
-
-model FormResponse {
+model CustomForm {
   id        Int      @id @default(autoincrement())
-  formId    Int
-  form      Form     @relation(fields: [formId], references: [id])
-  response  Json
+  userId    String   // Changed from formId to userId for clarity
+  title     String
+  fields    Json
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], name: "CreatedBy")
 }
 
+model Application {
+  id              String      @id @default(uuid())
+  title           String
+  logoUrl         String?
+  status          String?
+  createdAt       DateTime    @default(now())
+  creator         User        @relation(fields: [creatorId], references: [id], name: "CreatedApplications")
+  tenantId        String?
+  tenant          User?        @relation(fields: [tenantId], references: [id])
+  propertyAddress String?
+  leaseStartDate  DateTime?
+  leaseEndDate    DateTime?
+  fields          Json
+}
+
+model Payment {
+  id        String      @id @default(uuid())
+  tenantId  String
+  amount    Float
+  status    String      @default("pending")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  tenant    User        @relation(fields: [tenantId], references: [id]) // Changed 'user' to 'tenant' for clarity
+}

@@ -11,7 +11,6 @@ const {
 
 } = require("../controllers/auth.controllers");
 
-const secretKey = 'admin';
 
 const authRouter = express.Router();
 
