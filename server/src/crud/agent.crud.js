@@ -1,19 +1,21 @@
 const crypto = require('crypto');
 
+const { v4: uuidv4 } = require('uuid');
+
 
 
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient;
 
-const uuid = crypto.randomUUID();
-console.log(uuid);
+// const uuid = crypto.randomUUID();
+
 
 const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields) => {
   try {
     const application = await prisma.Application.create({
       data: {
-        id: uuid,  
+        id: uuidv4(),  
         title,
         logoUrl,
         status,
@@ -31,6 +33,28 @@ const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDa
   }
 };
 
+const getAllApplication = async (agentId)  =>{
+  return await prisma.Application.findMany({
+    where: {
+      agentId : { equals : agentId}
+    }
+  })
+};
+
+const updateApplications = async (agentId, id, title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields ) => {
+  return await prisma.Application.update({
+      where : {  agentId, id },
+      data: { 
+        title,
+        logoUrl,
+        status,
+        propertyAddress,
+        leaseStartDate,
+        leaseEndDate,
+        fields: JSON.stringify(fields),
+      }
+  });
+}
   const createFormLink = async (formId) => {
     return await prisma.formLink.create({
       data: {
@@ -41,7 +65,7 @@ const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDa
   };
 
   const getApplicationById = async (id, agentId) => {
-    return await prisma.application.findFirst({
+    return await prisma.Application.findFirst({
       where: { id: parseInt(id), agentId },
     });
   };
@@ -53,4 +77,10 @@ const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDa
     });
   };
   
-  module.exports = { createForm, createFormLink, getApplicationById, updateApplicationStatus };
+  module.exports = { createForm,
+                     createFormLink, 
+                     getApplicationById, 
+                     updateApplicationStatus, 
+                     getAllApplication,
+                     updateApplications 
+                    };

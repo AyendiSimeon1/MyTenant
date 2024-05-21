@@ -1,7 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 
-const { createForm } = require('../crud/agent.crud');
-
+const { createForm, getAllApplication, updateApplications, updateApplicationStatus } = require('../crud/agent.crud');
 const prisma =  new PrismaClient;
 
 const createFormController = async (req, res) => {
@@ -30,7 +29,38 @@ const createFormController = async (req, res) => {
     }
   };
 
+const getAllApplications = async (req, res) => {
+  try {
+    const { agentId } = req.params;
+    const applications = await getAllApplication(agentId);
+    if(!applications) {
+      res.status(404).json({ message:'Applications not found' });
+    }
+    res.status(200).json({ message: applications });
+  } catch (error) {
+    res.status(500).json('Internal Server Error');
+  }
+}
+const updateApplication = async (req, res) => {
   
+  try {
+    const { agentId, id } = req.params;
+    console.log([agentId, id]);
+    const { title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields } = req.body;
+
+    
+    const updatedApplication = await updateApplications(agentId, id, title, logoUrl, status,propertyAddress, leaseStartDate, leaseEndDate,  fields);
+    if(!updatedApplication) {
+      res.status(404).json({ message: 'Application not found' });
+
+    }
+    return updatedApplication;
+  } catch (error) {
+    console.error(error);
+    res.status(500).json('Internal server error');
+  }
+}
+
   const getApplicationByIdController = async (req, res) => {
     try {
       const { id } = req.params;
@@ -76,4 +106,4 @@ const rejectApplicationController = async (req, res) => {
   }
 };
 
-module.exports = { createFormController };
+module.exports = { createFormController, getApplicationByIdController, getAllApplications, updateApplication };

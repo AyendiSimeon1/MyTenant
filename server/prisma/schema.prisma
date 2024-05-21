@@ -48,9 +48,8 @@ model Application {
   logoUrl         String?
   status          String?
   createdAt       DateTime    @default(now())
-  creator         User        @relation(fields: [creatorId], references: [id], name: "CreatedApplications")
-  tenantId        String?
-  tenant          User?        @relation(fields: [tenantId], references: [id])
+  agentId         String?
+  agent           User?        @relation(fields: [agentId], references: [id], name: "CreatedApplications")
   propertyAddress String?
   leaseStartDate  DateTime?
   leaseEndDate    DateTime?
