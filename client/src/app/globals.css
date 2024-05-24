@@ -31,3 +31,37 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.slide-in {
+  opacity: 1;
+  animation: slideIn 0.5s forwards;
+}
+
+.transform {
+  transform: translateY(0);
+}
+
+
+.transition-transform {
+  transition: transform 0.3s;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}

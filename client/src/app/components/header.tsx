@@ -7,26 +7,24 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-4">
         <div className="flex items-center">
           <Link href="/" legacyBehavior>
-            <a className="text-2xl font-bold text-purple-600">MyTenant</a>
+            <a className="text-2xl font-bold text-darkBlue">MyTenant</a>
           </Link>
         </div>
         <div className="hidden md:flex space-x-6">
           <Link href="/features" legacyBehavior>
-            <a className="text-gray-700 hover:text-purple-600">Features</a>
+            <a className="text-gray-700 hover:text-darkBlue transition duration-300">Features</a>
           </Link>
           <Link href="/pricing" legacyBehavior>
-            <a className="text-gray-700 hover:text-purple-600">Pricing</a>
+            <a className="text-gray-700 hover:text-darkBlue transition duration-300">About Us</a>
           </Link>
           <Link href="/resources" legacyBehavior>
-            <a className="text-gray-700 hover:text-purple-600">Resources</a>
+            <a className="text-gray-700 hover:text-darkBlue transition duration-300">Resources</a>
           </Link>
-          <Link href="/blog" legacyBehavior>
-            <a className="text-gray-700 hover:text-purple-600">Blog</a>
-          </Link>
+     
         </div>
         <div className="flex items-center space-x-4">
           <Link href="/signup" legacyBehavior>
-            <a className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">Contact us</a>
+            <a className="bg-orange text-white px-4 py-2 rounded hover:bg-darkBlue transition duration-300">Signup</a>
           </Link>
         </div>
       </div>

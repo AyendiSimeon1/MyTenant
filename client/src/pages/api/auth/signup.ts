@@ -6,7 +6,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === 'POST') {
     try {
       const { username, email, password, role } = req.body;
-      const response = await axios.post('http://localhost:5000/api/auth/signup', {
+      const response = await axios.post('http://127.0.0.1:3001/api/v1/auth/signup', {
         username,
         email,
         password,
@@ -14,8 +14,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       res.status(200).json(response.data);
     } catch (error: any) {
-      console.error('Error in API route:', error.response.data);
-      res.status(error.response.status).json({ message: error.response.data.message });
+      console.error('Error in API route:', error );
+      res.status(error.response.status).json({ message: error });
     }
   } else {
     res.setHeader('Allow', ['POST']);

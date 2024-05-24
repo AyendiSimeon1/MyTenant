@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const cors = require('cors');
 const { mainRouter } = require('./routers/index');
 
 
@@ -11,6 +11,7 @@ const server = require("http").createServer(app);
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Server is running!!!");
