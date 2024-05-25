@@ -79,11 +79,31 @@ const createFormLink = async (applicationId) => {
       data: { status },
     });
   };
+
+  const createAgency = async (data) => {
+    // Ensure `agencyId` data type matches `User.id`
+    if (typeof data.userId !== typeof data.agencyId) {
+      throw new Error('Data type mismatch between userId and agencyId');
+    }
   
-  module.exports = { createForm,
+    return await prisma.agency.create({
+      data: {
+        ...data,
+        user: {
+          connect: {
+            agencyId: data.agencyId // Use agencyId for the connection
+          }
+        }
+      }
+    });
+  };
+
+  
+module.exports = { createForm,
                      createFormLink, 
                      getApplicationById, 
                      updateApplicationStatus, 
                      getAllApplication,
-                     updateApplications 
+                     updateApplications,
+                     createAgency 
                     };

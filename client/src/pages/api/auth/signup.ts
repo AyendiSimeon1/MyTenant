@@ -14,8 +14,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
       res.status(200).json(response.data);
     } catch (error: any) {
-      console.error('Error in API route:', error );
-      res.status(error.response.status).json({ message: error });
+      const statusCode = error.response?.status || 500;
+      const message = error.response?.data?.message || 'An unexpected error occurred';
+
+      res.status(statusCode).json({ message });
     }
   } else {
     res.setHeader('Allow', ['POST']);

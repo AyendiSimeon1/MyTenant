@@ -7,7 +7,7 @@ const Footer = () => {
             <div className="mb-8 md:mb-0">
               <h2 className="text-xl font-bold text-white mb-4">MyTenant</h2>
               <p className="text-gray-400">
-                MyTenant is a powerful tool to keep your team organized and productive.
+                MyTenant is a powerful tool to manage tenants onboarding process seamlessly
               </p>
             </div>
             <div className="grid grid-cols-2 gap-8 md:gap-16 md:grid-cols-4">
