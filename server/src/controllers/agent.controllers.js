@@ -120,13 +120,9 @@ const rejectApplicationController = async (req, res) => {
 
 
 const createAgencyProfile = async (req, res) => {
-  const userId = req.user.id; 
-  if (!userId || !req.body.companyName || !req.body.streetName || !req.body.area || !req.body.lga || !req.body.state) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
 
   try {
-    const { companyName, logo, streetName, area, lga, state } = req.body;
+    const { companyName, logo, streetName, area, lga, state, userId } = req.body;
 
     const data = {
       companyName,
@@ -135,7 +131,7 @@ const createAgencyProfile = async (req, res) => {
       area,
       lga,
       state,
-      userId 
+      userId
     };
 
     const newAgency = await agencyService.createAgency(data);
@@ -143,7 +139,6 @@ const createAgencyProfile = async (req, res) => {
   } catch (error) {
     console.error('Error creating agency profile:', error);
 
-    // Provide more specific error messages if possible
     if (error.message.includes('data type mismatch')) {
       return res.status(400).json({ message: 'Data type mismatch between userId and agencyId (if applicable)' });
     } else {
