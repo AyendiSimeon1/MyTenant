@@ -2,6 +2,7 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { useUser } from '../../../userContext';
 
 interface LoginFormData {
   email: string;
@@ -17,6 +18,7 @@ const LoginForm: React.FC = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
+  const { setUser } = useUser();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -37,9 +39,10 @@ const LoginForm: React.FC = () => {
         }
       });
       console.log('User logged in successfully:', response.data);
+      setUser(response.data);
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        router.push('/dashboard');
+        router.push('/profile');
       }
     } catch (err: any) {
       console.error('Error logging in:', err);

@@ -1,10 +1,12 @@
 const { PrismaClient } = require('@prisma/client');
-
+const nodemailer = require('nodemailer');
+const { v4: uuidv4 } = require('uuid');
 const { createForm, 
         getAllApplication, 
         updateApplications, 
         updateApplicationStatus,
-        createFormLink 
+        createFormLink,
+        createAgency
       } = require('../crud/agent.crud');
 const prisma =  new PrismaClient;
 
@@ -119,31 +121,135 @@ const rejectApplicationController = async (req, res) => {
 };
 
 
+
 const createAgencyProfile = async (req, res) => {
+  const { companyName, streetName, area, lga, state, userId } = req.body;
+
+  if (!companyName || !streetName || !area || !lga || !state || !userId) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const data = {
+    companyName,
+    streetName,
+    area,
+    lga,
+    state,
+    user: {
+      connect: { id: userId },
+    },
+    
+  };
 
   try {
-    const { companyName, logo, streetName, area, lga, state, userId } = req.body;
-
-    const data = {
-      companyName,
-      logo,
-      streetName,
-      area,
-      lga,
-      state,
-      userId
-    };
-
-    const newAgency = await agencyService.createAgency(data);
+    const newAgency = await prisma.Agency.create({ data });
     res.status(201).json(newAgency);
   } catch (error) {
     console.error('Error creating agency profile:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
-    if (error.message.includes('data type mismatch')) {
-      return res.status(400).json({ message: 'Data type mismatch between userId and agencyId (if applicable)' });
-    } else {
-      return res.status(500).json({ message: 'Internal server error' });
+const getTemplates = async (req, res) => {
+  try {
+    const templates = await prisma.template.findMany();
+    res.json(templates);
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const createProperty = async (req, res) => {
+  const { address, type, agencyId } = req.body;
+
+  console.log('Received data:', { address, type, agencyId }); // Log received data
+
+
+  try {
+    // Create a new property
+    const newProperty = await prisma.property.create({
+      data: {
+        address,
+        type,
+        agency: {
+          connect: { id: agencyId },
+        },
+      },
+    });
+
+    res.json(newProperty);
+  } catch (error) {
+    console.error('Error creating property:', error);
+    res.status(500).json({ error: 'Failed to create property' });
+  }
+};
+
+
+const getAllProperties = async (req, res) => {
+  const { id } = req.params; // Access the parameter correctly
+
+  console.log(id); // Should now log the agency ID
+
+  // Rest of your code to handle agencyId
+  try {
+    if (!id) {
+      return res.status(400).json({ error: 'agencyId query parameter is required' });
     }
+    
+    const properties = await prisma.property.findMany({
+      where: {
+        agencyId: id
+      },
+    });
+    
+    res.status(200).json(properties);
+    console.log(properties);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Error fetching properties' });
+}
+};
+
+const sendEmail = async (req, res) => {
+  try {
+    const { email, link, agencyId } = req.body;
+
+    // Check if email, link, and agencyId are provided
+    if (!email || !link || !agencyId) {
+      return res.status(400).json({ message: 'Missing required parameters' });
+    }
+
+    // Create a nodemailer transporter with Brevo SMTP details
+    const transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: '75a4e9001@smtp-brevo.com',
+        pass: 'Q8BvNpJ9GFaIZg0x',
+      },
+    });
+
+    // Define email options
+    const mailOptions = {
+      from: 'MyTenant',
+      to: email,
+      subject: 'Test Email From My Tenant',
+      html: `
+        <p>Hello,</p>
+        <p>Please click the following link to access the form:</p>
+        <p><a href="${link}">${link}</a></p>
+      `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Failed to send email' });
   }
 };
 
@@ -152,5 +258,9 @@ module.exports = { createFormController,
                     getAllApplications, 
                     updateApplication,
                     generateLink,
-                    createAgencyProfile
+                    createAgencyProfile,
+                    getTemplates,
+                    createProperty,
+                    getAllProperties,
+                    sendEmail
                   };

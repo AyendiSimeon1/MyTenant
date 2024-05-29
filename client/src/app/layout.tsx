@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { UserProvider } from '../userContext';
+import { ReactNode } from 'react';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -9,14 +11,17 @@ export const metadata: Metadata = {
   description: "Easy Tenat Onboarding Process",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <UserProvider>
+        <body className={inter.className}>{children}</body>
+        </UserProvider>
+      </body>
     </html>
   );
-}
+};
+
+export default RootLayout;
+

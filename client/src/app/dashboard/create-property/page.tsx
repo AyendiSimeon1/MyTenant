@@ -1,19 +1,19 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Dashboard from '../components/dashboard/dashboard';
-import { UserProvider } from '../../userContext';
+import AddProperty from '../../components/dashboard/properties/addProperty';
+import { UserProvider } from '../../../userContext';
 
-const DashboardPage: any = () => {
+const AddPropertyPage: any = () => {
   return (
     
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
      
-        <Dashboard />
+        <AddProperty />
       
       
     </div>
   );
 };
 
-export default DashboardPage;
+export default AddPropertyPage;

@@ -20,32 +20,76 @@ model User {
   resetToken    String?        @unique
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  forms         CustomForm[]  @relation("CreatedBy")
   payments      Payment[]
   applications  Application[] @relation("CreatedApplications")
   agencyId      String?       @unique
-  Agency        Agency?
+  agency        Agency?       @relation(fields: [agencyId], references: [id])
 }
 
 model Agency {
   id          String @id @default(uuid())
-  companyName String
-  logo        String
-  streetName  String
+  companyName String?
+  logo        String?
+  streetName  String?
   area        String
   lga         String
   state       String
-  user        User   @relation(fields: [userId], references: [agencyId])
-  userId      String @unique
+  userId      String? @unique
+  user        User?   @relation 
+ 
+  phone       String?
+  properties  Property[]
 }
 
-model CustomForm {
+model Property {
   id        Int      @id @default(autoincrement())
-  userId    String
-  title     String
-  fields    Json
+  address   String
+  type      String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], name: "CreatedBy")
+  agencyId  String
+  agency    Agency   @relation(fields: [agencyId], references: [id])
+}
+
+model Template {
+  id        Int     @id @default(autoincrement())
+  name      String
+  fields    Json    // Store fields as JSON data
+  createdAt DateTime @default(now())
+}
+
+
+model Tenant {
+  id                    String     @id @default(uuid())
+  fullName              String
+  gender                String?
+  religion              String?
+  dateOfBirth           DateTime?
+  occupation            String?
+  currentAddress        String?
+  phoneNumber           String?
+  email                 String?
+  nextOfKinName         String?
+  nextOfKinContact      String?
+  nextOfKinAddress      String?
+  nextOfKinRelationship String?
+  placeOfWork           String?
+  localGovernmentOrigin String?
+  state                 String?
+  references            Reference[]
+}
+
+model Reference {
+  id                String   @id @default(uuid())
+  tenantId          String
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+  name              String
+  phone             String?
+  email             String?
+  contactInfo       String?
+  relationship      String?
+  isConfirmed       Boolean  @default(false)
+  additionalDetails String?
+  identityDocument  String?
 }
 
 model Application {
@@ -56,14 +100,10 @@ model Application {
   createdAt       DateTime               @default(now())
   agentId         String?
   agent           User?                  @relation(fields: [agentId], references: [id], name: "CreatedApplications")
-  propertyAddress String?
-  leaseStartDate  DateTime?
-  leaseEndDate    DateTime?
   fields          Json
   uniqueLink      String?
   submissions     SubmittedApplication[] @relation("ApplicationSubmissions")
 }
-
 model SubmittedApplication {
   id            String      @id @default(uuid())
   applicationId String

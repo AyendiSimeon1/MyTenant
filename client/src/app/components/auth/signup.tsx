@@ -10,7 +10,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   password: string;
-  role: string;
+
 }
 
 const SignupForm: React.FC = () => {
@@ -20,7 +20,7 @@ const SignupForm: React.FC = () => {
     firstName: '',
     lastName: '',
     password: '',
-    role: 'AGENT',
+    
   });
 
   const [error, setError] = useState<string | null>(null);
