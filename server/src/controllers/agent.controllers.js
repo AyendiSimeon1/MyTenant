@@ -233,7 +233,7 @@ const sendEmail = async (req, res) => {
 
     // Define email options
     const mailOptions = {
-      from: 'MyTenant',
+      from: '75a4e9001@smtp-brevo.com',
       to: email,
       subject: 'Test Email From My Tenant',
       html: `
@@ -252,6 +252,31 @@ const sendEmail = async (req, res) => {
     res.status(500).json({ message: 'Failed to send email' });
   }
 };
+
+const submitForm = async (req, res) => {
+  const { agencyId, templateId, propertyId, formData } = req.body;
+
+  if (!agencyId || !templateId || !propertyId || !formData) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const newFormSubmission = await prisma.formSubmission.create({
+      data: {
+        agency: { connect: { id: agencyId } },
+        template: { connect: { id: templateId } },
+        property: { connect: { id: propertyId } },
+        data: formData,
+      },
+    });
+
+    res.status(201).json(newFormSubmission);
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 module.exports = { createFormController, 
                     getApplicationByIdController, 

@@ -39,6 +39,7 @@ model Agency {
  
   phone       String?
   properties  Property[]
+  formSubmissions FormSubmission[]
 }
 
 model Property {
@@ -48,6 +49,7 @@ model Property {
   createdAt DateTime @default(now())
   agencyId  String
   agency    Agency   @relation(fields: [agencyId], references: [id])
+  formSubmissions FormSubmission[]
 }
 
 model Template {
@@ -55,33 +57,25 @@ model Template {
   name      String
   fields    Json    // Store fields as JSON data
   createdAt DateTime @default(now())
+  formSubmissions FormSubmission[]
 }
 
 
-model Tenant {
-  id                    String     @id @default(uuid())
-  fullName              String
-  gender                String?
-  religion              String?
-  dateOfBirth           DateTime?
-  occupation            String?
-  currentAddress        String?
-  phoneNumber           String?
-  email                 String?
-  nextOfKinName         String?
-  nextOfKinContact      String?
-  nextOfKinAddress      String?
-  nextOfKinRelationship String?
-  placeOfWork           String?
-  localGovernmentOrigin String?
-  state                 String?
-  references            Reference[]
+model FormSubmission {
+  id            String         @id @default(uuid())
+  agencyId      String
+  templateId    Int
+  propertyId    Int
+  data          Json
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  agency        Agency         @relation(fields: [agencyId], references: [id])
+  template      Template       @relation(fields: [templateId], references: [id])
+  property      Property       @relation(fields: [propertyId], references: [id])
 }
 
 model Reference {
   id                String   @id @default(uuid())
-  tenantId          String
-  tenant            Tenant   @relation(fields: [tenantId], references: [id])
   name              String
   phone             String?
   email             String?
