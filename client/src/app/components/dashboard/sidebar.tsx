@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faUsers, faMoneyBillAlt, faEnvelope, faTicketAlt, faCog, faBars } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,34 +18,33 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
         </button>
       </div>
       <nav className="space-y-1">
-        <a href="/" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        <Link href="/" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faHome} className="mr-2" />
           Dashboard
-        </a>
-        <a href="/members" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        </Link>
+        <Link href="/members" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faUsers} className="mr-2" />
           Members
-        </a>
-        <a href="/invoices" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        </Link>
+        <Link href="/invoices" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faMoneyBillAlt} className="mr-2" />
           Invoices
-        </a>
-        <a href="/messages" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        </Link>
+        <Link href="/messages" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
           Messages
-        </a>
-        <a href="/tickets" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        </Link>
+        <Link href="/tickets" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faTicketAlt} className="mr-2" />
           Tickets
-        </a>
-        <a href="/settings" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
+        </Link>
+        <Link href="/settings" className="flex items-center p-2 rounded-lg hover:bg-gray-100 text-darkBlue font-medium transition duration-300 ease-in-out">
           <FontAwesomeIcon icon={faCog} className="mr-2" />
           Settings
-        </a>
+        </Link>
       </nav>
     </div>
   );
 };
 
 export default Sidebar;
-

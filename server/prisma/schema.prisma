@@ -72,6 +72,7 @@ model FormSubmission {
   agency        Agency         @relation(fields: [agencyId], references: [id])
   template      Template       @relation(fields: [templateId], references: [id])
   property      Property       @relation(fields: [propertyId], references: [id])
+  references    Reference[]
 }
 
 model Reference {
@@ -84,6 +85,9 @@ model Reference {
   isConfirmed       Boolean  @default(false)
   additionalDetails String?
   identityDocument  String?
+  formSubmissionId  String         @unique
+  formSubmission    FormSubmission @relation(fields: [formSubmissionId], references: [id])
+
 }
 
 model Application {

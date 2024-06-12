@@ -3,6 +3,8 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useUser } from '../../../userContext';
+import ClipLoader from 'react-spinners/ClipLoader';
+import Link from 'next/link';
 
 interface LoginFormData {
   email: string;
@@ -18,7 +20,8 @@ const LoginForm: React.FC = () => {
   });
 
   const [error, setError] = useState<string | null>(null);
-  const { setUser } = useUser();
+  const [loading, setLoading] = useState<boolean>(false);
+  const { setUser, setAgency } = useUser();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -32,6 +35,7 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await axios.post('/api/auth/login', formData, {
         headers: {
@@ -39,10 +43,18 @@ const LoginForm: React.FC = () => {
         }
       });
       console.log('User logged in successfully:', response.data);
-      setUser(response.data);
+      setUser(response.data.user);
+      setAgency(response.data.agency);
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        router.push('/profile');
+
+        // Redirect based on agency profile existence
+        if (response.data.user.hasAgencyProfile) {
+          router.push('/dashboard');
+        } else {
+          router.push('/profile');
+        }
       }
     } catch (err: any) {
       console.error('Error logging in:', err);
@@ -76,26 +88,27 @@ const LoginForm: React.FC = () => {
         </label>
         <input
           type="password"
-          name="password"
-          id="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="pl-14 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-          required
+            name="password"
+            id="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="pl-14 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
+            required
         />
       </div>
 
       <button
         type="submit"
-        className="w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl"
+        className="w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
+        disabled={loading} // Disable button while loading
       >
-        Login
+        {loading ? <ClipLoader size={24} color={"#fff"} /> : "Login"} {/* Show loader or text */}
       </button>
 
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
       <div className="text-center mt-4">
         <p className="text-gray-500 text-lg">
-          Don't have an account? <a href="/signup" className="text-orange-500 hover:underline">Signup</a>
+          Don't have an account? <Link href="/signup" className="text-orange-500 hover:underline">Signup</Link>
         </p>
       </div>
     </form>

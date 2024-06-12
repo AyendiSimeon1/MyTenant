@@ -1,6 +1,9 @@
 const { PrismaClient } = require('@prisma/client');
 const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 const { v4: uuidv4 } = require('uuid');
+const request = require('request');
+require('dotenv').config(); 
 const { createForm, 
         getAllApplication, 
         updateApplications, 
@@ -9,6 +12,12 @@ const { createForm,
         createAgency
       } = require('../crud/agent.crud');
 const prisma =  new PrismaClient;
+
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+let apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = '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';
+
+let apiInstance = new SibApiV3Sdk.TransactionalSMSApi();
 
 const createFormController = async (req, res) => {
     try {
@@ -68,7 +77,7 @@ const updateApplication = async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    return res.status(200).json({ message: 'Application updated successfully' });  // Or just return a 200 status code
+    return res.status(200).json({ message: 'Application updated successfully' });  
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal server error' });
@@ -96,8 +105,6 @@ const updateApplication = async (req, res) => {
       if (!application) return res.sendStatus(403);
   
       await updateApplicationStatus(id, 'approved');
-  
-      // TODO: Implement sending payment link to applicant
   
       res.json({ message: 'Application approved and payment link sent' });
     } catch (error) {
@@ -163,11 +170,11 @@ const getTemplates = async (req, res) => {
 const createProperty = async (req, res) => {
   const { address, type, agencyId } = req.body;
 
-  console.log('Received data:', { address, type, agencyId }); // Log received data
+  console.log('Received data:', { address, type, agencyId }); 
 
 
   try {
-    // Create a new property
+   
     const newProperty = await prisma.property.create({
       data: {
         address,
@@ -187,11 +194,9 @@ const createProperty = async (req, res) => {
 
 
 const getAllProperties = async (req, res) => {
-  const { id } = req.params; // Access the parameter correctly
+  const { id } = req.params; 
 
-  console.log(id); // Should now log the agency ID
-
-  // Rest of your code to handle agencyId
+  console.log(id); 
   try {
     if (!id) {
       return res.status(400).json({ error: 'agencyId query parameter is required' });
@@ -214,13 +219,12 @@ const getAllProperties = async (req, res) => {
 const sendEmail = async (req, res) => {
   try {
     const { email, link, agencyId } = req.body;
+    console.log(link);
 
-    // Check if email, link, and agencyId are provided
     if (!email || !link || !agencyId) {
       return res.status(400).json({ message: 'Missing required parameters' });
     }
 
-    // Create a nodemailer transporter with Brevo SMTP details
     const transporter = nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
@@ -231,7 +235,6 @@ const sendEmail = async (req, res) => {
       },
     });
 
-    // Define email options
     const mailOptions = {
       from: '75a4e9001@smtp-brevo.com',
       to: email,
@@ -243,10 +246,11 @@ const sendEmail = async (req, res) => {
       `,
     };
 
-    // Send email
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Message sent: %s', info.messageId);
 
     res.status(200).json({ message: 'Email sent successfully' });
+    console.log('Email has been sent');
   } catch (error) {
     console.error('Error sending email:', error);
     res.status(500).json({ message: 'Failed to send email' });
@@ -277,6 +281,153 @@ const submitForm = async (req, res) => {
   }
 };
 
+const userSubmitForm = async (req, res) => {
+  const { agencyId, templateId, propertyId, formData } = req.body;
+
+  try {
+    const newSubmission = await prisma.formSubmission.create({
+      data: {
+        agencyId,
+        templateId: parseInt(templateId, 10),
+        propertyId: parseInt(propertyId, 10),
+        data: formData,
+      },
+    });
+    res.status(201).json(newSubmission);
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    res.status(500).json({ error: 'Failed to submit form. Please try again later.' });
+  }
+};
+
+const getTemplate = async (req, res) => {
+  const { templateId } = req.params;
+
+  try {
+    const template = await prisma.template.findUnique({
+      where: { id: parseInt(templateId, 10) },
+    });
+
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    res.status(200).json(template);
+  } catch (error) {
+    console.error('Error fetching template:', error);
+    res.status(500).json({ error: 'Failed to fetch template. Please try again later.' });
+  }
+};
+
+const sendRefrenceSms = async (req, res) => {
+  const { phoneNumber, messageContent } = req.body;
+    const data = {
+              "to": phoneNumber,
+              "from":"N-Alert",
+              "sms": messageContent,
+              "type":"plain",
+              "api_key": process.env.TERMII_API_KEY,
+              "channel":"generic" 
+            };
+    const options = {
+    'method': 'POST',
+    'url': 'https://api.ng.termii.com/api/sms/send',
+    'headers': {
+      'Content-Type': ['application/json', 'application/json']
+    },
+    body: JSON.stringify(data)
+
+    };
+    request(options, function (error, response) { 
+    if (error) throw new Error(error);
+    console.log(response.body);
+    });
+  };
+
+const submitReference = async (req, res) => {
+    const { formSubmissionId, name, phone, email, contactInfo, relationship, additionalDetails, identityDocument } = req.body;
+    try {
+      const reference = await prisma.reference.create({
+        data: {
+          formSubmissionId,
+          name,
+          phone,
+          email,
+          contactInfo,
+          relationship,
+          additionalDetails,
+          identityDocument,
+        },
+      });
+      res.status(201).json(reference);
+    } catch (error) {
+          res.status(500).json({ error: 'Failed to create reference', details: error.message });
+  }
+};
+
+const getAllFormSubmissions = async (req, res) => {
+  const { agencyId } = req.params;
+
+  try {
+    const formSubmissions = await prisma.formSubmission.findMany({
+      where: {
+        agencyId: agencyId,
+      },
+      include: {
+        template: true,
+        property: true,
+        references: true,
+      },
+    });
+
+    res.status(200).json(formSubmissions);
+  } catch (error) {
+    console.error('Error fetching form submissions:', error);
+    res.status(500).json({ error: 'Failed to fetch form submissions' });
+  }
+};
+
+const getAllSubmiteedForm = async (req, res) => {
+  const { agencyId } = req.params;
+
+  try {
+    const formSubmissions = await prisma.formSubmission.findMany({
+      where: {
+        agencyId: agencyId,
+      },
+      include: {
+        template: true,
+        property: true,
+        references: true,
+      },
+    });
+
+    res.status(200).json(formSubmissions);
+  } catch (error) {
+    console.error('Error fetching form submissions:', error);
+    res.status(500).json({ error: 'Failed to fetch form submissions' });
+  }
+};
+
+const updateFormSubmissionStatus = async (req, res) => {
+  const { formSubmissionId, status } = req.body;
+
+  if (!formSubmissionId || !['approved', 'rejected'].includes(status)) {
+    return res.status(400).json({ message: 'Missing or invalid required fields' });
+  }
+
+  try {
+    const updatedFormSubmission = await prisma.formSubmission.update({
+      where: { id: formSubmissionId },
+      data: { status: status },
+    });
+
+    res.status(200).json(updatedFormSubmission);
+  } catch (error) {
+    console.error('Error updating form submission status:', error);
+    res.status(500).json({ message: 'Failed to update form submission status' });
+  }
+};
 
 module.exports = { createFormController, 
                     getApplicationByIdController, 
@@ -287,5 +438,10 @@ module.exports = { createFormController,
                     getTemplates,
                     createProperty,
                     getAllProperties,
-                    sendEmail
+                    sendEmail,
+                    userSubmitForm,
+                    getTemplate,
+                    sendRefrenceSms,
+                    submitReference,
+                    getAllSubmiteedForm
                   };

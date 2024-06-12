@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -9,16 +8,12 @@ import withAuth from '../authMiddleware';
 import LogoutButton from '../auth/logoutButton';
 import { useUser } from '../../../userContext';
 import Link from 'next/link';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
+import BookingCard from './bookingCard';
 
 const Dashboard: React.FC = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const { user, agency } = useUser(); // Assuming useUser provides user and agency data
+  const [applications, setApplications] = useState([]);
+  const { user, agency } = useUser(); 
   const router = useRouter();
 
   const toggleSidebar = () => {
@@ -29,8 +24,19 @@ const Dashboard: React.FC = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push('/login');
+    } else {
+      fetchApplications();
     }
   }, [router]);
+
+  const fetchApplications = async () => {
+    try {
+      const response = await axios.get(`/api/applications/${agency.id}`);
+      setApplications(response.data);
+    } catch (error) {
+      console.error('Error fetching applications', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -62,6 +68,19 @@ const Dashboard: React.FC = () => {
             <StatCard title="All Applications" value="4" icon="money-bill-alt" />
             <StatCard title="Approved applications" value="2" icon="envelope" />
             <StatCard title="Pending applications" value="6" icon="ticket-alt" />
+          </div>
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4">Applications</h2>
+            {applications.map((application: any) => (
+              <BookingCard
+                key={application.id}
+                title={application.title}
+                roomType={application.propertyAddress}
+                startTime={application.leaseStartDate}
+                endTime={application.leaseEndDate}
+                status={application.status}
+              />
+            ))}
           </div>
         </main>
       </div>

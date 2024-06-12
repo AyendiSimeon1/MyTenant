@@ -61,32 +61,31 @@ const loginController = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await checkUserEmailExists(email);
-    if(!user) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
-    } 
+    }
     const hashedPassword = await getHashedPassword(email);
     const verifyPassword = await bcrypt.compare(password, hashedPassword);
 
-    if(!verifyPassword) {
+    if (!verifyPassword) {
       return res.status(401).json({ message: 'Invalid password' });
     }
-    const token = jwt.sign({ id:user.id, email: user.email}, 'admin', { expiresIn: '4h'});
-    const sanitizedUser = { // Optionally sanitize sensitive data (e.g., password)
+    
+    const agencyProfile = await getAgencyProfileByUserId(user.id);
+    const token = jwt.sign({ id: user.id, email: user.email }, 'admin', { expiresIn: '4h' });
+    const sanitizedUser = {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      hasAgencyProfile: !!agencyProfile
     };
-    console.log(sanitizedUser);
-    console.log(user);
 
-    res.json({ user: sanitizedUser, token: token });
-   
+    res.json({ user: sanitizedUser, token: token, agency: agencyProfile || null });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message:'Internal server error' });
+    res.status(500).json({ message: 'Internal server error' });
   }
-
 };
 
 const passwordResetController = async (req, res) => {

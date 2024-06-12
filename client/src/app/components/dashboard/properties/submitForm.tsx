@@ -1,7 +1,7 @@
 "use client";
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useUser } from '../../../../userContext';
 
 interface FormSubmissionData {
@@ -21,12 +21,11 @@ const SubmitForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Initialize formData with empty strings for each expected field
-    // Replace these with actual form fields
+   
     setFormData({
       name: '',
       email: '',
-      // add other form fields here
+     
     });
   }, []);
 

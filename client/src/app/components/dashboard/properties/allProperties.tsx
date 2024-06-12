@@ -188,7 +188,9 @@ const Properties = () => {
           Send Email
         </button>
       </form>
-
+      <p className="text-gray-500 text-lg">
+            <a href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</a>
+          </p>
       <button onClick={logContextData} className="mt-4 bg-gray-200 py-2 px-4 rounded-md">Log Context Data</button>
     </div>
   );

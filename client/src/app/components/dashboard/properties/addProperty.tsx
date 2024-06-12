@@ -3,7 +3,7 @@ import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useUser } from '../../../../userContext';
-
+import Link from 'next/link'; 
 interface PropertyFormData {
   address: string;
   type: string;
@@ -112,8 +112,16 @@ const AddProperty: React.FC = () => {
 
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
       </form>
+      
+      <Link href="/dashboard">
+              <button className="text-indigo-600 hover:underline">Dashboard</button>
+            </Link>
+            <Link href="/submit-form">
+              <button className="text-indigo-600 hover:underline">Send Form</button>
+            </Link>
       <button onClick={logContextData} className="bg-blue-500 text-white px-4 py-2 rounded">Log Context Data</button>
     </div>
+    
   );
 };
 

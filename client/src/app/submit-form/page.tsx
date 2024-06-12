@@ -4,4 +4,6 @@ const submitFormPage = async () => {
     return (
         <SubmitForm />
     );
-}
+};
+
+export default submitFormPage;

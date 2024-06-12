@@ -3,6 +3,7 @@ import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useUser } from '../../../userContext';
+import Link from 'next/link';
 
 interface AgencyFormData {
   companyName: string;
@@ -169,7 +170,9 @@ const AgencyProfileSetup: React.FC = () => {
 
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
       </form>
-
+      <p className="text-gray-500 text-lg">
+            <a href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</a>
+          </p>
       <button onClick={logContextData} className="bg-blue-500 text-white px-4 py-2 rounded">Log Context Data</button>
     </div>
   );
