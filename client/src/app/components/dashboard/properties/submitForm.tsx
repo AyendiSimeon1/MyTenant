@@ -1,19 +1,20 @@
 "use client";
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '../../../../userContext';
+import { Suspense } from 'react';
 
 interface FormSubmissionData {
   agencyId: string;
   templateId: string;
   propertyId: string;
-  formData: { [key: string]: string }; // Adjust this according to your form fields
+  formData: { [key: string]: string };
 }
 
 const SubmitForm: React.FC = () => {
   const router = useRouter();
-  const { query } = router;
+  const searchParams = useSearchParams();
   const { user, logContextData } = useUser();
 
   const [formData, setFormData] = useState<FormSubmissionData['formData']>({});
@@ -21,11 +22,9 @@ const SubmitForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-   
     setFormData({
       name: '',
       email: '',
-     
     });
   }, []);
 
@@ -38,7 +37,15 @@ const SubmitForm: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    const { agencyId, templateId, propertyId } = query;
+    if (!searchParams) {
+      setError('Missing required parameters');
+      setLoading(false);
+      return;
+    }
+
+    const agencyId = searchParams.get('agencyId');
+    const templateId = searchParams.get('templateId');
+    const propertyId = searchParams.get('propertyId');
 
     if (!agencyId || !templateId || !propertyId) {
       setError('Missing required parameters');
@@ -47,13 +54,13 @@ const SubmitForm: React.FC = () => {
     }
 
     const submissionData: FormSubmissionData = {
-      agencyId: agencyId as string,
-      templateId: templateId as string,
-      propertyId: propertyId as string,
+      agencyId,
+      templateId,
+      propertyId,
       formData,
     };
 
-    console.log('Submitting form with data:', submissionData); // Log formData
+    console.log('Submitting form with data:', submissionData);
 
     try {
       const response = await axios.post('http://localhost:3001/api/v1/form-submissions', submissionData, {
@@ -61,7 +68,7 @@ const SubmitForm: React.FC = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log('Response:', response); // Log response
+      console.log('Response:', response);
       alert('Form submitted successfully');
       router.push('/thank-you');
     } catch (err: any) {
@@ -107,8 +114,6 @@ const SubmitForm: React.FC = () => {
           />
         </div>
 
-        {/* Add more form fields as needed */}
-
         <button
           type="submit"
           className={`w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -132,3 +137,5 @@ const SubmitForm: React.FC = () => {
 };
 
 export default SubmitForm;
+
+

@@ -11,7 +11,6 @@ const {
 
 } = require("../controllers/auth.controllers");
 
-
 const authRouter = express.Router();
 
 authRouter.post('/signup', registerController);

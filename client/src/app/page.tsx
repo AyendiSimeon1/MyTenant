@@ -8,20 +8,19 @@ import Tips from './components/tips';
 import Footer from './components/footer';
 import type { AppProps } from 'next/app';
 import { UserProvider } from '../userContext';
+import 'tailwindcss/tailwind.css';
 
-const Home = ({ Component, pageProps }: AppProps) => {
+const Home = () => {
   return (
     <>
       <Navbar />
-      <Hero {...pageProps}  />
-      <OrganizeWork  {...pageProps} />
-      <Tools {...pageProps}  />
+      <Hero />
+      <OrganizeWork />
+      <Tools />
       <Tips />
-      
       <AboutUs />
       <Footer />
     </>
-   
   );
 };
 

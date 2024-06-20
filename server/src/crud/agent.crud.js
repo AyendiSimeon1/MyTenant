@@ -8,9 +8,6 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient;
 
-// const uuid = crypto.randomUUID();
-
-
 const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields) => {
   try {
     const application = await prisma.Application.create({
@@ -32,6 +29,7 @@ const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDa
     throw error; 
   }
 };
+
 
 const getAllApplication = async (agentId)  =>{
   return await prisma.Application.findMany({
@@ -80,6 +78,7 @@ const createFormLink = async (applicationId) => {
       data: { status },
     });
   };
+
 
   const createAgency = async (data) => {
     const agencyId = uuidv4(); // Generate a unique ID

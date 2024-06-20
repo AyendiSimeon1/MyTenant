@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 import { useUser } from '../../../../userContext'; 
@@ -13,13 +14,13 @@ interface Property {
     companyName: string;
     logo: string;
   } | null;
-  image: string; // Assuming an image URL is available for the property
+  image: string; 
 }
 
 interface Template {
   id: number;
   name: string;
-  thumbnail: string; // Assuming a thumbnail URL is available for the template
+  thumbnail: string; 
 }
 
 interface EmailForm {
@@ -42,7 +43,8 @@ const Properties = () => {
     console.log('User from context:', user);
   }, [agency, user]);
 
-  const agencyId = agency?.id;
+  const agencyId = agency?._id;
+  console.log(agencyId);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -62,7 +64,7 @@ const Properties = () => {
     };
 
     fetchProperties();
-  }, [agencyId]);
+  }, [agency, agencyId]);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -85,18 +87,20 @@ const Properties = () => {
 
   const handlePropertySelect = (property: Property) => {
     setSelectedProperty(property);
-    setEmailForm({ ...emailForm, propertyId: property.id });
+    setEmailForm({ ...emailForm, propertyId: property._id });
+    console.log('Selected Property:', property);
   };
 
   const handleTemplateSelect = (template: Template) => {
     setSelectedTemplate(template);
-    setEmailForm({ ...emailForm, templateId: template.id });
+    setEmailForm({ ...emailForm, templateId: template._id });
+    console.log('Selected Template:', template);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const link = `http://localhost:3000/forms?templateId=${emailForm.templateId}&propertyId=${emailForm.propertyId}&agencyId=${agencyId}`;
-
+    const link = `http://localhost:3000//forms/forms?templateId=${emailForm.templateId}&propertyId=${emailForm.propertyId}&agencyId=${agencyId}`;
+    console.log('Generated Link:', link);
     try {
       await axios.post(`http://127.0.0.1:3001/api/v1/agents/send-email`, {
         email: emailForm.email,
@@ -189,8 +193,8 @@ const Properties = () => {
         </button>
       </form>
       <p className="text-gray-500 text-lg">
-            <a href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</a>
-          </p>
+        <a href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</a>
+      </p>
       <button onClick={logContextData} className="mt-4 bg-gray-200 py-2 px-4 rounded-md">Log Context Data</button>
     </div>
   );

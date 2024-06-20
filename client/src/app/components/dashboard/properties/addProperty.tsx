@@ -19,19 +19,20 @@ const AddProperty: React.FC = () => {
     type: '',
     agencyId: '',
   });
+  console.log(formData);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (agency?.id) {
+    if (agency?._id) {
       setFormData((prevData) => ({
         ...prevData,
-        agencyId: agency.id,
+        agencyId: agency._id,
       }));
     }
   }, [agency]);
-
+  console.log(agency._id);
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -51,7 +52,7 @@ const AddProperty: React.FC = () => {
       });
       console.log('Response:', response); // Log response
       alert('Property added successfully');
-      router.push('/properties');
+      router.push('/dashboard/properties');
     } catch (err: any) {
       console.error('Error adding property:', err);
       setError(err.response ? err.response.data.message : 'An error occurred');

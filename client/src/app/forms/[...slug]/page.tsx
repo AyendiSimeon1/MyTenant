@@ -4,10 +4,13 @@ import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUser } from '../../../userContext';
 
+interface Field {
+  [key: string]: any;
+}
+
 interface Template {
-  id: number;
   name: string;
-  fields: { name: string; type: string }[];
+  fields: Field;
 }
 
 interface FormSubmissionData {
@@ -27,18 +30,15 @@ const SubmitForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const templateId = searchParams.get('templateId') || '';
-  console.log('This is the template id', templateId);
+  const templateId = searchParams ? searchParams.get('templateId') || '' : '';
   const url = `http://127.0.0.1:3001/api/v1/agents/templates/${templateId}`;
-
-  console.log('this is the url', url);
 
   useEffect(() => {
     logContextData();
 
     const fetchTemplate = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:3001/api/v1/agents/templates/${templateId}`);
+        const response = await axios.get<Template>(url);
         setTemplate(response.data);
         setLoading(false);
       } catch (error) {
@@ -51,7 +51,7 @@ const SubmitForm: React.FC = () => {
     if (templateId) {
       fetchTemplate();
     }
-  }, [templateId, logContextData]);
+  }, [templateId, logContextData, url]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -64,26 +64,55 @@ const SubmitForm: React.FC = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const submissionData: FormSubmissionData = {
-      agencyId: searchParams.get('agencyId') || '',
+      agencyId: searchParams ? searchParams.get('agencyId') || '' : '',
       templateId,
-      propertyId: searchParams.get('propertyId') || '',
+      propertyId: searchParams ? searchParams.get('propertyId') || '' : '',
       formData,
     };
 
     try {
       const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/submit-form', submissionData);
       console.log('Form submitted successfully:', response.data);
-      
+
       const uniqueLink = `http://127.0.0.1:3001/reference/form/${response.data.id}`;
 
       await axios.post('http://127.0.0.1:3001/api/v1/agents/send-sms', {
         phoneNumber: formData.referencePhoneNumber,
         messageContent: `Please complete your reference: ${uniqueLink}`,
       });
-
     } catch (error) {
       console.error('Error submitting form:', error);
-      
+    }
+  };
+
+  const renderField = (field: Field, fieldName: string) => {
+    if (typeof field === 'object' && field !== null) {
+      return (
+        <div key={fieldName} className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            {fieldName}
+          </label>
+          {Object.entries(field).map(([nestedFieldName, nestedFieldValue]) =>
+            renderField(nestedFieldValue, nestedFieldName)
+          )}
+        </div>
+      );
+    } else {
+      return (
+        <div key={fieldName} className="mb-4">
+          <label htmlFor={fieldName} className="block text-sm font-medium text-gray-700">
+            {fieldName}
+          </label>
+          <input
+            type="text"
+            id={fieldName}
+            name={fieldName}
+            value={formData[fieldName] || ''}
+            onChange={handleInputChange}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+      );
     }
   };
 
@@ -94,21 +123,9 @@ const SubmitForm: React.FC = () => {
       {error && <p>Error: {error}</p>}
       {template && (
         <form onSubmit={handleSubmit}>
-          {template.fields.map((field, index) => (
-            <div key={index} className="mb-4">
-              <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
-                {field.name}
-              </label>
-              <input
-                type={field.type}
-                id={field.name}
-                name={field.name}
-                value={formData[field.name] || ''}
-                onChange={handleInputChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-          ))}
+          {Object.entries(template.fields).map(([fieldName, fieldValue]) =>
+            renderField(fieldValue, fieldName)
+          )}
           <div className="mb-4">
             <label htmlFor="referencePhoneNumber" className="block text-sm font-medium text-gray-700">
               Reference Phone Number
@@ -130,10 +147,8 @@ const SubmitForm: React.FC = () => {
           </button>
         </form>
       )}
-     
     </div>
-);
+  );
 };
 
 export default SubmitForm;
-

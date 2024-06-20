@@ -1,5 +1,6 @@
+"use client";
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 
 interface FormData {
@@ -24,7 +25,8 @@ const initialFormData: FormData = {
 
 const ReferenceForm = () => {
   const router = useRouter();
-  const { formSubmissionId } = router.query;
+  const searchParams = useSearchParams();
+  const formSubmissionId = searchParams?.get('formSubmissionId'); // Use optional chaining to get the query parameter
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,6 +35,11 @@ const ReferenceForm = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!formSubmissionId) {
+      alert('Missing formSubmissionId');
+      return;
+    }
 
     try {
       const res = await axios.post('http://127.0.0.1:3001/api/v1/agents/submit-reference', {

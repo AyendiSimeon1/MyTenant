@@ -3,6 +3,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
+import Image from 'next/image';
 
 interface User {
   id: string;
@@ -26,7 +27,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({ user, toggleSidebar }
         {user && (
           <div className="flex items-center">
             <span className="mr-4 text-darkBlue">Welcome, {user.name}</span>
-            <img className="h-8 w-8 rounded-full" src="/path-to-profile-picture.jpg" alt="Profile" />
+            <Image
+              className="rounded-full"
+              src="/path-to-profile-picture.jpg"
+              alt="Profile"
+              width={32}
+              height={32}
+            />
           </div>
         )}
       </div>

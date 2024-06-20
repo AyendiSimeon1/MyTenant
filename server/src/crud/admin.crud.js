@@ -50,29 +50,10 @@ const updateApplicationStatus = async (applicationId, status) => {
     });
 };
 
-const getAgencyProfileByUserId = async (userId) => {
-  try {
-    const agencyProfile = await prisma.agency.findUnique({
-      where: {
-        userId: userId,
-      },
-    });
-
-    if (!agencyProfile) {
-      throw new Error('Agency profile not found');
-    }
-
-    return agencyProfile;
-  } catch (error) {
-    console.error('Error fetching agency profile:', error);
-    throw error;
-  }
-};
 
 module.exports = {
     getForms,
     getPayments,
     getApplications,
-    getSuccessfulTenanciesReport,
-    getAgencyProfileByUserId
+    getSuccessfulTenanciesReport
 };

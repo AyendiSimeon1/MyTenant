@@ -11,11 +11,15 @@ const {
     getTemplates,
     createProperty,
     getAllProperties,
+    getAllSubmitedForm,
     sendEmail,
     userSubmitForm,
     getTemplate,
     sendRefrenceSms,
-    submitReference
+    submitReference,
+    createTemplate,
+    updateFormSubmissionStatus,
+    initiatePayment
  } = require('../controllers/agent.controllers');
 
 const  agentRouter = express.Router();
@@ -27,6 +31,8 @@ agentRouter.post('/profile',  upload.single('logo'), createAgencyProfile);
 agentRouter.get("/application/:id", getApplicationByIdController);
 
 agentRouter.get("/templates", getTemplates);
+
+agentRouter.get("/submited-forms", getAllSubmitedForm);
 
 agentRouter.post("/create-property", createProperty);
 
@@ -47,6 +53,12 @@ agentRouter.get("/templates/:templateId", getTemplate);
 agentRouter.post("/send-sms", sendRefrenceSms);
 
 agentRouter.post("/submit-reference", submitReference);
+
+agentRouter.post("/create-template", createTemplate);
+
+agentRouter.post("/update-status", updateFormSubmissionStatus);
+
+agentRouter.post("/initiate-payment", initiatePayment);
 
 module.exports = { agentRouter }
 

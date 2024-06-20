@@ -67,6 +67,7 @@ model FormSubmission {
   templateId    Int
   propertyId    Int
   data          Json
+  status        String         @default("pending")
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   agency        Agency         @relation(fields: [agencyId], references: [id])

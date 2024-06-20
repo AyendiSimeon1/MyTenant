@@ -9,17 +9,15 @@ const {
 const secretKey = 'admin';
 
 const generateToken = (user) => {
-  const  token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+  const  token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '100y' });
   return token;
 };
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
   console.log(token);
-
   if(!token) {
     return res.status(401).json({ message: 'No token provided' });
   }
-
   jwt.verify(token.split(' ')[1], 'admin', (err, decoded) =>{
     if(err) {
       console.error(err);
@@ -30,5 +28,6 @@ const verifyToken = (req, res, next) => {
   });
   
 };
+
 
 module.exports = { verifyToken, generateToken };

@@ -8,6 +8,7 @@ import withAuth from '../authMiddleware';
 import LogoutButton from '../auth/logoutButton';
 import { useUser } from '../../../userContext';
 import Link from 'next/link';
+import SubmittedForms from './formComponent';
 import BookingCard from './bookingCard';
 
 const Dashboard: React.FC = () => {
@@ -23,20 +24,20 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/login');
+      // router.push('/login');
     } else {
-      fetchApplications();
+      // fetchApplications();
     }
   }, [router]);
 
-  const fetchApplications = async () => {
-    try {
-      const response = await axios.get(`/api/applications/${agency.id}`);
-      setApplications(response.data);
-    } catch (error) {
-      console.error('Error fetching applications', error);
-    }
-  };
+  // const fetchApplications = async () => {
+  //   try {
+  //     const response = await axios.get(`/api/applications/${agency?.id}`);
+  //     setApplications(response.data);
+  //   } catch (error) {
+  //     console.error('Error fetching applications', error);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -60,7 +61,7 @@ const Dashboard: React.FC = () => {
             <div className="mb-6 p-4 bg-white shadow rounded">
               <h2 className="text-2xl font-semibold">Agency Info</h2>
               <p><strong>Name:</strong> {agency.companyName}</p>
-              <p><strong>ID:</strong> {agency.id}</p>
+              <p><strong>ID:</strong> {agency._id}</p>
             </div>
           )}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -82,6 +83,7 @@ const Dashboard: React.FC = () => {
               />
             ))}
           </div>
+          <SubmittedForms />
         </main>
       </div>
     </div>

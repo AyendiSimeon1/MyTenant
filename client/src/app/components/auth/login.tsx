@@ -35,13 +35,16 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setLoading(true); // Set loading state
+    setError(null); // Clear previous errors
+
     try {
       const response = await axios.post('/api/auth/login', formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+
       console.log('User logged in successfully:', response.data);
       setUser(response.data.user);
       setAgency(response.data.agency);
@@ -49,16 +52,17 @@ const LoginForm: React.FC = () => {
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
 
-        // Redirect based on agency profile existence
         if (response.data.user.hasAgencyProfile) {
-          router.push('/dashboard');
+          router.push('/dashboard'); // Redirect to dashboard if agency profile exists
         } else {
-          router.push('/profile');
+          router.push('/profile'); // Redirect to profile creation page if no agency profile
         }
       }
     } catch (err: any) {
       console.error('Error logging in:', err);
       setError(err.response ? err.response.data.message : 'An error occurred');
+    } finally {
+      setLoading(false); // Unset loading state
     }
   };
 
@@ -88,12 +92,12 @@ const LoginForm: React.FC = () => {
         </label>
         <input
           type="password"
-            name="password"
-            id="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="pl-14 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
+          name="password"
+          id="password"
+          value={formData.password}
+          onChange={handleChange}
+          className="pl-14 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
+          required
         />
       </div>
 
@@ -108,7 +112,7 @@ const LoginForm: React.FC = () => {
       {error && <p className="text-red-500 text-center mt-4">{error}</p>}
       <div className="text-center mt-4">
         <p className="text-gray-500 text-lg">
-          Don't have an account? <Link href="/signup" className="text-orange-500 hover:underline">Signup</Link>
+          Don&apos;t have an account? <Link href="/signup" className="text-orange-500 hover:underline">Signup</Link>
         </p>
       </div>
     </form>

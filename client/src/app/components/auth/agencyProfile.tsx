@@ -18,13 +18,19 @@ const AgencyProfileSetup: React.FC = () => {
   const router = useRouter();
   const { user, setAgency, logContextData } = useUser();
 
+  useEffect(() => {
+    if (user) {
+      console.log('I am the user id', user.id);
+    }
+  }, [user]);
+
   const [formData, setFormData] = useState<AgencyFormData>({
     companyName: '',
     streetName: '',
     area: '',
     lga: '',
     state: '',
-    userId: user?.user?.id || '',
+    userId: user?.id || '',
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -32,9 +38,10 @@ const AgencyProfileSetup: React.FC = () => {
 
   useEffect(() => {
     if (user) {
+      console.log('User context updated:', user);
       setFormData((prevData) => ({
         ...prevData,
-        userId: user?.user?.id || '',
+        userId: user.id,
       }));
     }
   }, [user]);
@@ -47,6 +54,8 @@ const AgencyProfileSetup: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    console.log('Form data being submitted:', formData);
 
     try {
       const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/profile', formData, {
@@ -130,7 +139,6 @@ const AgencyProfileSetup: React.FC = () => {
             <option value="" disabled>Select LGA</option>
             <option value="LGA1">LGA1</option>
             <option value="LGA2">LGA2</option>
-            {/* More LGAs */}
           </select>
         </div>
 
@@ -149,7 +157,6 @@ const AgencyProfileSetup: React.FC = () => {
             <option value="" disabled>Select State</option>
             <option value="State1">State1</option>
             <option value="State2">State2</option>
-            {/* More states */}
           </select>
         </div>
 
@@ -171,8 +178,8 @@ const AgencyProfileSetup: React.FC = () => {
         {error && <p className="text-red-500 text-center mt-4">{error}</p>}
       </form>
       <p className="text-gray-500 text-lg">
-            <a href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</a>
-          </p>
+        <Link href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</Link>
+      </p>
       <button onClick={logContextData} className="bg-blue-500 text-white px-4 py-2 rounded">Log Context Data</button>
     </div>
   );

@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import heroImage from '../../../public/hero-illustration.png';
-
 
 const HeroSection: React.FC = () => {
-  const heroRef = useRef();
+  const heroRef = useRef<HTMLDivElement | null>(null); // Set the type of heroRef and initialize it to null
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -16,7 +14,9 @@ const HeroSection: React.FC = () => {
       });
     });
 
-    observer.observe(heroRef.current);
+    if (heroRef.current) {
+      observer.observe(heroRef.current); // Check if heroRef.current is not null
+    }
 
     return () => observer.disconnect();
   }, []); // Empty dependency array to run effect only once
@@ -38,10 +38,7 @@ const HeroSection: React.FC = () => {
             </div> */}
           </div>
           <div className="md:w-1/2">
-          
-          <Image src="/hero-illustration.png" width={600} height={600} className="rounded-lg shadow-lg"  alt='illustrator image'/>
-
-
+            <Image src="/hero-illustration.png" width={600} height={600} className="rounded-lg shadow-lg" alt='illustrator image' />
           </div>
         </div>
       </div>

@@ -9,7 +9,7 @@ const withAuth = (WrappedComponent: React.FC) => {
 
     useEffect(() => {
       if (!user) {
-        router.push('/login');
+      //  router.push('/login');
       }
     }, [user, router]);
 
