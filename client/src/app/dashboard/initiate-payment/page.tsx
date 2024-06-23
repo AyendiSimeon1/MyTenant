@@ -1,71 +1,128 @@
 "use client";
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import axios from 'axios';
-import Image from 'next/image';
 
-const PaymentButton = () => {
-  const [loading, setLoading] = useState(false);
+const Payment = () => {
+ 
 
-  const handlePayment = async () => {
-    setLoading(true);
+  const [formData, setFormData] = useState({
+    MerchantRef:  '453894252',
+    Amount: '5000000',
+    Description: '',
+    CustomerName:  '',
+    CustomerEmail: '',
+    CustomerMobile: ''
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const response = await axios.post('http://127.0.0.1:3001/api/v1/initiatePayment', {
-        MerchantRef: 'unique-merchant-reference',
-        Amount: 500000,
-        Description: 'Payment for property',
-        CustomerName: 'John Doe',
-        CustomerEmail: 'johndoe@example.com',
-        CustomerMobile: '08012345678',
-        Splits: [
-          {
-            WalletCode: 'wallet-code-1',
-            Amount: 300000,
-            ShouldDeductFrom: true
-          },
-          {
-            WalletCode: 'wallet-code-2',
-            Amount: 200000,
-            ShouldDeductFrom: false
-          }
-        ]
-      });
-
-      if (response.data.redirectUrl) {
-        window.location.href = response.data.redirectUrl;
-      } else {
-        console.error('Failed to get redirect URL');
+      const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/initiate-payment', formData);
+      const paymentResponse = response.data;
+      if (paymentResponse.succeeded) {
+        window.location.href = paymentResponse.data.redirectUrl;
       }
     } catch (error) {
-      console.error('Payment initiation failed:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error initiating payment:', error);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white shadow-md rounded-lg p-6 max-w-lg w-full text-center">
-        <Image src="/path/to/your/logo.png" alt="Logo" className="mx-auto mb-4 w-24 h-24" width={96} height={96} />
-        <h1 className="text-2xl font-bold mb-4">Make Payment to My Tenant</h1>
-        <p className="mb-6 text-gray-700">You can easily make a payment for your property using the button below. Click &quot;Pay Now&quot; to proceed to the secure payment portal.</p>
-        <button 
-          onClick={handlePayment} 
-          disabled={loading} 
-          className={`flex items-center justify-center px-6 py-3 w-full text-white font-semibold rounded-lg transition-colors ${
-            loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-          }`}
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Payment Details</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="MerchantRef">
+            Merchant Reference
+          </label>
+          <input
+            type="text"
+            name="MerchantRef"
+            value={formData.MerchantRef}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            readOnly
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Amount">
+            Amount
+          </label>
+          <input
+            type="number"
+            name="Amount"
+            value={formData.Amount}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            readOnly
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="Description">
+            Description
+          </label>
+          <input
+            type="text"
+            name="Description"
+            value={formData.Description}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="CustomerName">
+            Customer Name
+          </label>
+          <input
+            type="text"
+            name="CustomerName"
+            value={formData.CustomerName}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="CustomerEmail">
+            Customer Email
+          </label>
+          <input
+            type="email"
+            name="CustomerEmail"
+            value={formData.CustomerEmail}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="CustomerMobile">
+            Customer Mobile
+          </label>
+          <input
+            type="tel"
+            name="CustomerMobile"
+            value={formData.CustomerMobile}
+            onChange={handleChange}
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
         >
-          {loading && (
-            <svg className="animate-spin mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-          )}
-          {loading ? 'Processing...' : 'Pay Now'}
+          Proceed to Payment
         </button>
-      </div>
+      </form>
     </div>
   );
 };
 
-export default PaymentButton;
+export default Payment;

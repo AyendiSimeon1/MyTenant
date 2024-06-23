@@ -32,7 +32,7 @@ const AddProperty: React.FC = () => {
       }));
     }
   }, [agency]);
-  console.log(agency._id);
+  console.log(agency?._id);
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });

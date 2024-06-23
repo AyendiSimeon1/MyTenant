@@ -2,6 +2,7 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Modal from 'react-modal';
 import { useUser } from '../../../userContext';
 
 interface Field {
@@ -29,6 +30,7 @@ const SubmitForm: React.FC = () => {
   const [template, setTemplate] = useState<Template | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const templateId = searchParams ? searchParams.get('templateId') || '' : '';
   const url = `http://127.0.0.1:3001/api/v1/agents/templates/${templateId}`;
@@ -74,12 +76,15 @@ const SubmitForm: React.FC = () => {
       const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/submit-form', submissionData);
       console.log('Form submitted successfully:', response.data);
 
-      const uniqueLink = `http://127.0.0.1:3001/reference/form/${response.data.id}`;
-
+      const uniqueLink = `http://127.0.0.1:3000/forms/reference/${response.data._id}`;
+      console.log(uniqueLink);
       await axios.post('http://127.0.0.1:3001/api/v1/agents/send-sms', {
         phoneNumber: formData.referencePhoneNumber,
         messageContent: `Please complete your reference: ${uniqueLink}`,
       });
+
+      // Show the modal upon successful submission
+      setIsModalOpen(true);
     } catch (error) {
       console.error('Error submitting form:', error);
     }
@@ -127,6 +132,19 @@ const SubmitForm: React.FC = () => {
             renderField(fieldValue, fieldName)
           )}
           <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email || ''}
+              onChange={handleInputChange}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
             <label htmlFor="referencePhoneNumber" className="block text-sm font-medium text-gray-700">
               Reference Phone Number
             </label>
@@ -147,6 +165,25 @@ const SubmitForm: React.FC = () => {
           </button>
         </form>
       )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Form Submission Success"
+        className="flex items-center justify-center min-h-screen"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      >
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold mb-4">Form Submitted Successfully</h2>
+          <p>Your form has been submitted successfully.</p>
+          <button
+            onClick={() => setIsModalOpen(false)}
+            className="mt-4 py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };

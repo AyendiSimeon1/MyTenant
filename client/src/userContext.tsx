@@ -10,7 +10,7 @@ interface User {
 }
 
 interface Agency {
-  id: string;
+  _id: string;
   companyName: string;
   logo: string | null;
   streetName: string;

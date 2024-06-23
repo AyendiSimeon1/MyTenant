@@ -7,7 +7,7 @@ import Image from 'next/image'; // Importing Image from next/image
 import defaultImage from '/public/mytenant-logo.jpg'; // Importing default image
 
 interface Property {
-  id: string;
+  _id: string;
   address: string;
   type: string;
   agency: {
@@ -18,7 +18,7 @@ interface Property {
 }
 
 interface Template {
-  id: number;
+  _id: number;
   name: string;
   thumbnail: string; 
 }
@@ -126,8 +126,8 @@ const Properties = () => {
         <div className="grid grid-cols-3 gap-4">
           {properties.map((property) => (
             <div
-              key={property.id}
-              className={`p-4 border rounded-md cursor-pointer ${emailForm.propertyId === property.id ? 'border-indigo-500' : ''}`}
+              key={property.type}
+              className={`p-4 border rounded-md cursor-pointer ${emailForm.propertyId === property._id ? 'border-indigo-500' : ''}`}
               onClick={() => handlePropertySelect(property)}
             >
               <Image 
@@ -152,7 +152,7 @@ const Properties = () => {
         <div className="grid grid-cols-3 gap-4">
           {templates.map((template) => (
             <div
-              key={template.id}
+              key={template.name}
               className={`p-4 border rounded-md cursor-pointer ${emailForm.templateId === template.id ? 'border-indigo-500' : ''}`}
               onClick={() => handleTemplateSelect(template)}
             >

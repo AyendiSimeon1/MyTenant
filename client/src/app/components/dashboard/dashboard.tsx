@@ -61,15 +61,10 @@ const Dashboard: React.FC = () => {
             <div className="mb-6 p-4 bg-white shadow rounded">
               <h2 className="text-2xl font-semibold">Agency Info</h2>
               <p><strong>Name:</strong> {agency.companyName}</p>
-              <p><strong>ID:</strong> {agency._id}</p>
+             
             </div>
           )}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <StatCard title="Members onsite" value="26/88" icon="users" />
-            <StatCard title="All Applications" value="4" icon="money-bill-alt" />
-            <StatCard title="Approved applications" value="2" icon="envelope" />
-            <StatCard title="Pending applications" value="6" icon="ticket-alt" />
-          </div>
+         
           <div className="mt-6">
             <h2 className="text-2xl font-semibold mb-4">Applications</h2>
             {applications.map((application: any) => (
@@ -83,7 +78,7 @@ const Dashboard: React.FC = () => {
               />
             ))}
           </div>
-          <SubmittedForms />
+          {/* <SubmittedForms /> */}
         </main>
       </div>
     </div>

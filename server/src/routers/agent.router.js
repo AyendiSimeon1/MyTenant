@@ -19,7 +19,11 @@ const {
     submitReference,
     createTemplate,
     updateFormSubmissionStatus,
-    initiatePayment
+    initiatePayment,
+    sendApprovalMail,
+    getUsers,
+    getProperties,
+    getPayments
  } = require('../controllers/agent.controllers');
 
 const  agentRouter = express.Router();
@@ -59,6 +63,12 @@ agentRouter.post("/create-template", createTemplate);
 agentRouter.post("/update-status", updateFormSubmissionStatus);
 
 agentRouter.post("/initiate-payment", initiatePayment);
+
+agentRouter.get("/users", getUsers);
+
+agentRouter.get("/properties", getProperties);
+
+agentRouter.get("all-payment", getPayments);
 
 module.exports = { agentRouter }
 

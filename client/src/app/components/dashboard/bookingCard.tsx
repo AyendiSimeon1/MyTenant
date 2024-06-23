@@ -1,21 +1,35 @@
-interface BookingCardProps {
-  title: string;
-  roomType: string;
-  startTime: string;
-  endTime: string;
-  status: string; // Possible values: 'Confirmed', 'Pending', 'Rejected'
+"use client";
+import React from 'react';
+
+interface Property {
+  _id: string;
+  address: string;
+  type: string;
+  createdAt: string; // Adjust the type according to your actual data type
+  imageUrl: string;
+  agencyId: string;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ title, roomType, startTime, endTime, status }) => {
+interface BookingCardProps {
+  property: Property;
+}
+
+const BookingCard: React.FC<BookingCardProps> = ({ property }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg mb-4">
-      <h3 className="text-lg font-bold">{title}</h3>
-      <p>Room Type: {roomType}</p>
-      <p>Start Time: {startTime}</p>
-      <p>End Time: {endTime}</p>
-      <p className={`font-semibold ${status === 'Confirmed' ? 'text-green-600' : status === 'Pending' ? 'text-yellow-600' : 'text-red-600'}`}>
-        {status}
-      </p>
+    <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
+      <img className="w-full" src={property.imageUrl} alt={property.address} />
+      <div className="px-6 py-4">
+        <div className="font-bold text-xl mb-2">{property.address}</div>
+        <p className="text-gray-700 text-base">
+          Type: {property.type}
+        </p>
+        <p className="text-gray-700 text-base">
+          Created At: {new Date(property.createdAt).toLocaleDateString()}
+        </p>
+      </div>
+      <div className="px-6 pt-4 pb-2">
+        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">Agency: {property.agencyId}</span>
+      </div>
     </div>
   );
 };

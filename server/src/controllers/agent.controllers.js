@@ -5,6 +5,7 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const now = new Date();
 require('dotenv').config(); 
+const request = require('request');
 const { createForm, 
         getAllApplication, 
         updateApplications, 
@@ -223,28 +224,6 @@ const sendEmail = async (req, res) => {
 };
 
 
-const submitForm = async (req, res) => {
-  const { agencyId, templateId, propertyId, formData } = req.body;
-
-  if (!agencyId || !templateId || !propertyId || !formData) {
-    return res.status(400).json({ message: 'Missing required fields' });
-  }
-
-  try {
-    const newFormSubmission = new FormSubmission({
-      agencyId,
-      templateId,
-      propertyId,
-      data: formData,
-    });
-    await newFormSubmission.save();
-    res.status(201).json(newFormSubmission);
-  } catch (error) {
-    console.error('Error submitting form:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
 
 const userSubmitForm = async (req, res) => {
   const { agencyId, templateId, propertyId, formData } = req.body;
@@ -258,6 +237,7 @@ const userSubmitForm = async (req, res) => {
     });
     await newSubmission.save();
     res.status(201).json(newSubmission);
+    
   } catch (error) {
     console.error('Error submitting form:', error);
     res.status(500).json({ error: 'Failed to submit form. Please try again later.' });
@@ -321,7 +301,8 @@ const getAllSubmitedForm = async (req, res) => {
   const { agencyId } = req.params;
 
   try {
-    const formSubmissions = await FormSubmission.find({ agencyId }).populate('template').populate('property').populate('references');
+    const formSubmissions = await FormSubmission.find()
+    
     res.status(200).json(formSubmissions);
   } catch (error) {
     console.error('Error fetching form submissions:', error);
@@ -331,7 +312,6 @@ const getAllSubmitedForm = async (req, res) => {
 
 const initiatePayment = async (req, res) => {
   const { MerchantRef, Amount, Description, CustomerName, CustomerEmail, CustomerMobile } = req.body;
-
   const paymentData = {
     Currency: 'NGN',
     MerchantRef,
@@ -349,19 +329,17 @@ const initiatePayment = async (req, res) => {
     maxBodyLength: Infinity,
     url: 'https://payment-api.staging.cyberpay.ng/api/v1/payments',
     headers: { 
-      'ApiKey': 'MDc4YjQ4YTVjNjQ0NDJkZGI2M2FjM2QxZjA2MDQxNTM',
+      'ApiKey': 'MDc4YjQ4YTVjNjQ0NDJkZGI2M2FjM2QxZjA2MDQxNTM=',
       'Content-Type': 'application/json'
     },
     data: JSON.stringify(paymentData)
   };
-
   try {
     console.log("Sending request to Cyberpay:", config);
     const response = await axios(config);
     console.log("Response from Cyberpay:", response.data);
     res.status(200).json(response.data);
   } catch (error) {
- 
     if (error.response) {
       console.error("Response data:", error.response.data);
       console.error("Response status:", error.response.status);
@@ -372,7 +350,6 @@ const initiatePayment = async (req, res) => {
     }
   }
 };
-
 
 const updateFormSubmissionStatus = async (req, res) => {
   const { formSubmissionId, status, userEmail } = req.body;
@@ -386,16 +363,7 @@ const updateFormSubmissionStatus = async (req, res) => {
       { status },
       { new: true }
     );
-
-    if (status === 'approved') {
-      const amount = 5000000; // Example amount in kobo (50000 NGN)
-      const paymentLink = await generateCyberPayLink({ body: { formSubmissionId, status, userEmail } });
-
-      // Send payment link email
-      await sendPaymentLinkEmail(userEmail, paymentLink);
-    }
-
-    res.status(200).json({ message: 'Form approved and payment link sent.', updatedFormSubmission });
+    res.status(200).json({ message: 'Form approved.', updatedFormSubmission });
   } catch (error) {
     console.error('Error updating form submission status:', error);
     res.status(500).json({ message: 'Failed to update form submission status' });
@@ -404,7 +372,7 @@ const updateFormSubmissionStatus = async (req, res) => {
 
 const sendRefrenceSms = async (req, res) => {
   const { phoneNumber, messageContent } = req.body;
-
+  console.log(messageContent);
   const data = {
     to: phoneNumber,
     from: "N-Alert",
@@ -421,6 +389,7 @@ const sendRefrenceSms = async (req, res) => {
     },
     body: JSON.stringify(data),
   };
+
   request(options, (error, response) => {
     if (error) {
       console.error('Error sending SMS:', error);
@@ -428,6 +397,69 @@ const sendRefrenceSms = async (req, res) => {
     }
     res.status(200).json({ message: 'SMS sent successfully', response: response.body });
   });
+};
+
+const sendApprovalMail = async (req, res) => {
+  try {
+    const { email, formId } = req.body;
+    const link = "http://127.0.0.1:3000/dashboard/initiate-payment";
+    if (!email || !formId) {
+      return res.status(400).json({ message: 'Missing required parameters' });
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: '75a4e9001@smtp-brevo.com',
+        pass: 'Q8BvNpJ9GFaIZg0x',
+      },
+    });
+
+    const mailOptions = {
+      from: 'Dev@mytenant.ng',
+      to: email,
+      subject: 'Form Approved - Next Steps',
+      html: `
+        <p>Hello,</p>
+        <p>Your form has been approved. Click the following link to proceed: ${link} </p>
+        <p><a href="${link}">Link</a></p>
+      `,
+    };
+    const info = await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'Email sent successfully' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Failed to send email' });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+};
+
+const getProperties = async (req, res) => {
+  try {
+    const properties = await Property.find();
+    res.status(200).json(properties);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching properties', error });
+  }
+};
+
+const getPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find();
+    res.status(200).json(payments);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching payments', error });
+  }
 };
 
 module.exports = { createFormController, 
@@ -447,7 +479,12 @@ module.exports = { createFormController,
                     createTemplate,
                     updateFormSubmissionStatus,
                     initiatePayment,
-                    getAllSubmitedForm
+                    getAllSubmitedForm,
+                    sendApprovalMail,
+                    getUsers,
+                    getProperties,
+                    getPayments
+
                   };
 
 
