@@ -23,14 +23,16 @@ const {
     sendApprovalMail,
     getUsers,
     getProperties,
-    getPayments
+    getPayments,
+    getAgent,
+    getProperty
  } = require('../controllers/agent.controllers');
 
 const  agentRouter = express.Router();
 
 agentRouter.post("/create-form", createFormController);
 
-agentRouter.post('/profile',  upload.single('logo'), createAgencyProfile);
+agentRouter.post('/profile',  upload.single('profilePicture'), createAgencyProfile);
 
 agentRouter.get("/application/:id", getApplicationByIdController);
 
@@ -54,6 +56,8 @@ agentRouter.post("/submit-form", userSubmitForm);
 
 agentRouter.get("/templates/:templateId", getTemplate);
 
+agentRouter.post("/send-approval-mail", sendApprovalMail);
+
 agentRouter.post("/send-sms", sendRefrenceSms);
 
 agentRouter.post("/submit-reference", submitReference);
@@ -66,9 +70,13 @@ agentRouter.post("/initiate-payment", initiatePayment);
 
 agentRouter.get("/users", getUsers);
 
+agentRouter.get("/agent/:agentId", getAgent);
+
+agentRouter.get("/property/:propertyId", getProperty)
+
 agentRouter.get("/properties", getProperties);
 
 agentRouter.get("all-payment", getPayments);
 
-module.exports = { agentRouter }
 
+module.exports = { agentRouter }

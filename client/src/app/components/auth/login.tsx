@@ -3,8 +3,9 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useUser } from '../../../userContext';
-import ClipLoader from 'react-spinners/ClipLoader';
+import { ClipLoader } from 'react-spinners';
 import Link from 'next/link';
+import { FiMail, FiLock } from 'react-icons/fi';
 
 interface LoginFormData {
   email: string;
@@ -35,8 +36,8 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true); // Set loading state
-    setError(null); // Clear previous errors
+    setLoading(true);
+    setError(null);
 
     try {
       const response = await axios.post('/api/auth/login', formData, {
@@ -51,71 +52,81 @@ const LoginForm: React.FC = () => {
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-
-        if (response.data.user.hasAgencyProfile) {
-          router.push('/dashboard'); // Redirect to dashboard if agency profile exists
-        } else {
-          router.push('/profile'); // Redirect to profile creation page if no agency profile
-        }
+        router.push(response.data.user.hasAgencyProfile ? '/dashboard' : '/profile');
       }
     } catch (err: any) {
       console.error('Error logging in:', err);
       setError(err.response ? err.response.data.message : 'An error occurred');
     } finally {
-      setLoading(false); // Unset loading state
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-8 max-w-lg mx-auto p-10 bg-white shadow-2xl rounded-lg">
-      <h1 className="text-5xl font-bold text-center mb-8">Login</h1>
-      <p className="text-center text-gray-500 mb-10 text-xl">Access your account</p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 to-orange-600 px-4 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 backdrop-blur-sm"></div>
+      <div className="z-10 w-full max-w-md">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-2xl overflow-hidden p-10 space-y-8">
+          <div className="text-center">
+            <h2 className="text-5xl font-bold text-gray-800 mb-2">Login</h2>
+            <p className="text-gray-500 text-xl">Access your account</p>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="relative">
+              <label htmlFor="email" className="text-xl font-medium text-gray-700 block mb-2">Email</label>
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-3 py-4 border border-gray-300 rounded-lg text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                  required
+                />
+              </div>
+            </div>
 
-      <div className="flex flex-col relative">
-        <label htmlFor="email" className="mb-3 text-xl font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          value={formData.email}
-          onChange={handleChange}
-          className="pl-14 shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-          required
-        />
+            <div className="relative">
+              <label htmlFor="password" className="text-xl font-medium text-gray-700 block mb-2">Password</label>
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full pl-12 pr-3 py-4 border border-gray-300 rounded-lg text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-lg text-2xl font-semibold text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+            disabled={loading}
+          >
+            {loading ? <ClipLoader size={24} color={"#ffffff"} /> : "Login"}
+          </button>
+
+          <div className="text-center mt-4">
+            <p className="text-gray-500 text-lg">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-orange-500 hover:underline">
+                Signup
+              </Link>
+            </p>
+          </div>
+        </form>
       </div>
-
-      <div className="flex flex-col relative">
-        <label htmlFor="password" className="mb-3 text-xl font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          value={formData.password}
-          onChange={handleChange}
-          className="pl-14 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-          required
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
-        disabled={loading} // Disable button while loading
-      >
-        {loading ? <ClipLoader size={24} color={"#fff"} /> : "Login"} {/* Show loader or text */}
-      </button>
-
-      {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-      <div className="text-center mt-4">
-        <p className="text-gray-500 text-lg">
-          Don&apos;t have an account? <Link href="/signup" className="text-orange-500 hover:underline">Signup</Link>
-        </p>
-      </div>
-    </form>
+    </div>
   );
 };
 

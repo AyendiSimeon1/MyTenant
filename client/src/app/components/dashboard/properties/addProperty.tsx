@@ -3,11 +3,13 @@ import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useUser } from '../../../../userContext';
-import Link from 'next/link'; 
+import Link from 'next/link';
+
 interface PropertyFormData {
   address: string;
   type: string;
   agencyId: string;
+  price: string;  // Added price field
 }
 
 const AddProperty: React.FC = () => {
@@ -18,8 +20,8 @@ const AddProperty: React.FC = () => {
     address: '',
     type: '',
     agencyId: '',
+    price: '',  // Initialize price field
   });
-  console.log(formData);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,7 +34,7 @@ const AddProperty: React.FC = () => {
       }));
     }
   }, [agency]);
-  console.log(agency?._id);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -42,15 +44,12 @@ const AddProperty: React.FC = () => {
     e.preventDefault();
     setLoading(true);
 
-    console.log('Submitting form with data:', formData); // Log formData
-
     try {
       const response = await axios.post('http://localhost:3001/api/v1/agents/create-property', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      console.log('Response:', response); // Log response
       alert('Property added successfully');
       router.push('/dashboard/properties');
     } catch (err: any) {
@@ -96,6 +95,21 @@ const AddProperty: React.FC = () => {
           />
         </div>
 
+        <div className="flex flex-col relative">
+          <label htmlFor="price" className="mb-3 text-xl font-medium text-gray-700">
+            Price
+          </label>
+          <input
+            type="text"
+            name="price"
+            id="price"
+            value={formData.price}
+            onChange={handleChange}
+            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
+            required
+          />
+        </div>
+
         <button
           type="submit"
           className={`w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -115,14 +129,13 @@ const AddProperty: React.FC = () => {
       </form>
       
       <Link href="/dashboard">
-              <button className="text-indigo-600 hover:underline">Dashboard</button>
-            </Link>
-            <Link href="/submit-form">
-              <button className="text-indigo-600 hover:underline">Send Form</button>
-            </Link>
+        <button className="text-indigo-600 hover:underline">Dashboard</button>
+      </Link>
+      <Link href="/submit-form">
+        <button className="text-indigo-600 hover:underline">Send Form</button>
+      </Link>
       <button onClick={logContextData} className="bg-blue-500 text-white px-4 py-2 rounded">Log Context Data</button>
     </div>
-    
   );
 };
 

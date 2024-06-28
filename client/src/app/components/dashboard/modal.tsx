@@ -2,7 +2,17 @@
 import React from 'react';
 import Modal from 'react-modal';
 
-const MyModal = ({ isOpen, onRequestClose, selectedForm, handleApprove, handleReject }) => {
+interface MyModalProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+  selectedForm: {
+    data: Record<string, any>;
+  };
+  handleApprove: (form: { data: Record<string, any> }) => void;
+  handleReject: (form: { data: Record<string, any> }) => void;
+}
+
+const MyModal: React.FC<MyModalProps> = ({ isOpen, onRequestClose, selectedForm, handleApprove, handleReject }) => {
   return (
     <Modal
       isOpen={isOpen}

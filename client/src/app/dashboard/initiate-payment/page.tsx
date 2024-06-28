@@ -1,19 +1,30 @@
 "use client";
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const Payment = () => {
- 
-
   const [formData, setFormData] = useState({
-    MerchantRef:  '453894252',
-    Amount: '5000000',
+    MerchantRef: '',
+    Amount: '',
     Description: '',
-    CustomerName:  '',
+    CustomerName: '',
     CustomerEmail: '',
     CustomerMobile: ''
   });
+
+  const generateMerchantRef = () => {
+    return 'MR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  };
+
+  useEffect(() => {
+    if (!formData.MerchantRef) {
+      setFormData((prevData) => ({
+        ...prevData,
+        MerchantRef: generateMerchantRef()
+      }));
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,7 +74,6 @@ const Payment = () => {
             value={formData.Amount}
             onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            readOnly
           />
         </div>
         <div className="mb-4">

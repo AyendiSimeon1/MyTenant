@@ -12,6 +12,7 @@ interface AgencyFormData {
   lga: string;
   state: string;
   userId: string;
+  profilePicture: File | null;  // Added profile picture field
 }
 
 const AgencyProfileSetup: React.FC = () => {
@@ -31,6 +32,7 @@ const AgencyProfileSetup: React.FC = () => {
     lga: '',
     state: '',
     userId: user?.id || '',
+    profilePicture: null,
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +53,33 @@ const AgencyProfileSetup: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFormData({ ...formData, profilePicture: e.target.files[0] });
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     console.log('Form data being submitted:', formData);
 
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('companyName', formData.companyName);
+    formDataToSubmit.append('streetName', formData.streetName);
+    formDataToSubmit.append('area', formData.area);
+    formDataToSubmit.append('lga', formData.lga);
+    formDataToSubmit.append('state', formData.state);
+    formDataToSubmit.append('userId', formData.userId);
+    if (formData.profilePicture) {
+      formDataToSubmit.append('profilePicture', formData.profilePicture);
+    }
+
     try {
-      const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/profile', formData, {
+      const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/profile', formDataToSubmit, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
       });
       setAgency(response.data);
@@ -158,6 +177,20 @@ const AgencyProfileSetup: React.FC = () => {
             <option value="State1">State1</option>
             <option value="State2">State2</option>
           </select>
+        </div>
+
+        <div className="flex flex-col relative">
+          <label htmlFor="profilePicture" className="mb-3 text-xl font-medium text-gray-700">
+            Profile Picture
+          </label>
+          <input
+            type="file"
+            name="profilePicture"
+            id="profilePicture"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
+          />
         </div>
 
         <button

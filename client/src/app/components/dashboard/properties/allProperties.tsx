@@ -99,7 +99,9 @@ const Properties = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const link = `http://localhost:3000//forms/forms?templateId=${emailForm.templateId}&propertyId=${emailForm.propertyId}&agencyId=${agencyId}`;
+    const link = `http://localhost:3000/forms/forms?templateId=${emailForm.templateId}&propertyId=${emailForm.propertyId}&agencyId=${agencyId}`;
+   
+   
     console.log('Generated Link:', link);
     try {
       await axios.post(`http://127.0.0.1:3001/api/v1/agents/send-email`, {
@@ -153,7 +155,7 @@ const Properties = () => {
           {templates.map((template) => (
             <div
               key={template.name}
-              className={`p-4 border rounded-md cursor-pointer ${emailForm.templateId === template.id ? 'border-indigo-500' : ''}`}
+              className={`p-4 border rounded-md cursor-pointer ${emailForm.templateId === template._id ? 'border-indigo-500' : ''}`}
               onClick={() => handleTemplateSelect(template)}
             >
               <Image 

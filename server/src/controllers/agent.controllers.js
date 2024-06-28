@@ -2,6 +2,8 @@ const { PrismaClient } = require('@prisma/client');
 const nodemailer = require('nodemailer');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
 const axios = require('axios');
+const multer = require('multer');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const now = new Date();
 require('dotenv').config(); 
@@ -44,6 +46,42 @@ const createFormController = async (req, res) => {
   } catch (error) {
       console.log(error);
       res.status(500).json({ error: 'Failed to create form' });
+  }
+};
+
+const getAgent = async (req, res) => {
+  try {
+    const agentId = req.params.agentId;
+    const agent = await Agency.findById(agentId)
+      .populate('properties')
+      .populate('formSubmissions');
+    
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+    
+    res.json(agent);
+  } catch (error) {
+    console.error('Error fetching agent:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const getProperty = async (req, res) => {
+  try {
+    const propertyId = req.params.propertyId;
+    const property = await Property.findById(propertyId)
+      .populate('agencyId')
+      .populate('formSubmissions');
+    
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+    
+    res.json(property);
+  } catch (error) {
+    console.error('Error fetching property:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -103,6 +141,17 @@ const getApplicationByIdController = async (req, res) => {
   }
 };
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');  // Change this to your desired upload directory
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Appending extension
+  }
+});
+
+const upload = multer({ storage: storage });
+
 const createAgencyProfile = async (req, res) => {
   try {
       const { companyName, streetName, area, lga, state, userId } = req.body;
@@ -110,7 +159,9 @@ const createAgencyProfile = async (req, res) => {
           return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const newAgency = new Agency({ companyName, streetName, area, lga, state, userId });
+      const profilePicture = req.file ? req.file.filename : null;
+
+      const newAgency = new Agency({ companyName, streetName, area, lga, state, userId, profilePicture  });
       await newAgency.save();
       res.status(201).json(newAgency);
   } catch (error) {
@@ -131,11 +182,11 @@ const getTemplates = async (req, res) => {
 
 const createProperty = async (req, res) => {
   try {
-      const { address, type, agencyId } = req.body;
+      const { address, type, agencyId, price } = req.body;
       if (!agencyId) {
         return res.status(400).json({ error: 'agencyId is required' });
       }
-      const newProperty = new Property({ address, type, agencyId });
+      const newProperty = new Property({ address, type, agencyId, price });
       await newProperty.save();
       res.json(newProperty);
   } catch (error) {
@@ -162,30 +213,6 @@ const getAllProperties = async (req, res) => {
     res.status(500).json({ error: 'Error fetching properties' });
   }
 };
-
-
-// const sendEmail = async (req, res) => {
-//   const emailCampaigns = new SibApiV3Sdk.CreateEmailCampaign();
-
-//   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-//   const scheduledAt = oneHourLater.toISOString().replace(/\.\d+Z$/, '');
-//   emailCampaigns.name = req.body.name || "Campaign sent via the API";
-//   emailCampaigns.subject = req.body.subject || "My subject";
-//   emailCampaigns.sender = req.body.sender || { "name": "From name", "email": "Dev@mytenant.ng" };
-//   emailCampaigns.type = "classic";
-//   emailCampaigns.htmlContent = req.body.htmlContent || 'Congratulations! You successfully sent this example campaign via the Brevo API.';
-//   emailCampaigns.recipients = req.body.recipients || { listIds: [2, 7] };
-//   emailCampaigns.scheduledAt = req.body.scheduledAt || '2024-06-20 00:00:01';
-
-//   apiInstance.createEmailCampaign(emailCampaigns)
-//     .then(data => {
-//       res.json({ message: 'API called successfully', data });
-//     })
-//     .catch(error => {
-//       res.status(500).json({ error: error.message });
-//       console.log(error);
-//     });
-// };
 
 const sendEmail = async (req, res) => {
   try {
@@ -302,8 +329,9 @@ const getAllSubmitedForm = async (req, res) => {
 
   try {
     const formSubmissions = await FormSubmission.find()
+    const referenceSubmission = await Reference.find();
+    res.json({ formSubmissions, referenceSubmission });
     
-    res.status(200).json(formSubmissions);
   } catch (error) {
     console.error('Error fetching form submissions:', error);
     res.status(500).json({ error: 'Failed to fetch form submissions' });
@@ -483,7 +511,9 @@ module.exports = { createFormController,
                     sendApprovalMail,
                     getUsers,
                     getProperties,
-                    getPayments
+                    getPayments,
+                    getProperty,
+                    getAgent
 
                   };
 

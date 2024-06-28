@@ -1,7 +1,7 @@
 "use client";
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 
@@ -10,7 +10,6 @@ interface FormData {
   firstName: string;
   lastName: string;
   password: string;
-
 }
 
 const SignupForm: React.FC = () => {
@@ -20,13 +19,12 @@ const SignupForm: React.FC = () => {
     firstName: '',
     lastName: '',
     password: '',
-    
   });
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -51,107 +49,126 @@ const SignupForm: React.FC = () => {
   };
 
   return (
-    <div className="pt-5 pb-5">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col space-y-8 max-w-3xl mx-auto p-10 bg-white shadow-2xl rounded-lg"
-      >
-        <h1 className="text-5xl font-bold text-darkBlue mb-8">Sign Up</h1>
-        <p className="text-center text-darkBlue text-gray-500 mb-10 text-xl">
-          Get started 
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-400 to-orange-600 py-12 px-4 sm:px-6 lg:px-8 relative">
+      <div className="absolute inset-0 backdrop-blur-sm"></div>
+      <div className="z-10 w-full max-w-4xl">
+        <form onSubmit={handleSubmit} className="bg-white shadow-2xl rounded-lg overflow-hidden relative z-10">
+          <div className="px-10 py-12 sm:px-12">
+            <h1 className="text-5xl font-bold text-gray-800 mb-2">Sign Up</h1>
+            <p className="text-gray-500 mb-8 text-xl">Get started with your account</p>
 
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="firstName" className="text-xl font-medium text-gray-700">
-            First Name
-          </label>
-          <input
-            type="text"
-            name="firstName"
-            id="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="pl-2 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="lastName" className="text-xl font-medium text-gray-700">
-            Last Name
-          </label>
-          <input
-            type="text"
-            name="lastName"
-            id="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="pl-2 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="email" className="text-xl font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="pl-2 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col space-y-1">
-          <label htmlFor="password" className="text-xl font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            value={formData.password}
-            onChange={handleChange}
-            className="pl-2 shadow-lg rounded-lg px-5 py-2 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col space-y-4">
-          <button
-            type="submit"
-            className={`w-full bg-orange text-white px-6 py-2 rounded-lg text-xl font-semibold transition duration-200 shadow-lg hover:shadow-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={loading}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <div className="loader mr-2"></div>
-                Signing in...
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="relative">
+                <label htmlFor="firstName" className="text-sm font-medium text-gray-700 block mb-2">
+                  First Name
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faUser} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    name="firstName"
+                    id="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="pl-12 py-3 shadow-sm block w-full sm:text-lg border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
               </div>
-            ) : (
-              'Signup'
-            )}
-          </button>
-        </div>
 
-        <div className="text-center mt-4">
-          <p className="text-gray-500 text-lg">
-            Have an account? <a href="/login" className="text-orange-500 hover:underline">Login</a>
-          </p>
-        </div>
-      </form>
+              <div className="relative">
+                <label htmlFor="lastName" className="text-sm font-medium text-gray-700 block mb-2">
+                  Last Name
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faUser} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    name="lastName"
+                    id="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="pl-12 py-3 shadow-sm block w-full sm:text-lg border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="relative sm:col-span-2">
+                <label htmlFor="email" className="text-sm font-medium text-gray-700 block mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faEnvelope} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-12 py-3 shadow-sm block w-full sm:text-lg border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="relative sm:col-span-2">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700 block mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <FontAwesomeIcon icon={faLock} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-12 py-3 shadow-sm block w-full sm:text-lg border-gray-300 rounded-md focus:ring-orange-500 focus:border-orange-500"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+
+            <div className="mt-8">
+              <button
+                type="submit"
+                className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="loader mr-2"></div>
+                    Signing up...
+                  </div>
+                ) : (
+                  'Sign Up'
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="px-10 py-4 bg-gray-50 border-t border-gray-200 sm:px-12">
+            <p className="text-sm text-gray-500">
+              Already have an account?{' '}
+              <a href="/login" className="font-medium text-orange-500 hover:text-orange-600">
+                Log in
+              </a>
+            </p>
+          </div>
+        </form>
+      </div>
       <style jsx>{`
         .loader {
-          border: 4px solid #f3f3f3;
-          border-top: 4px solid #3498db;
+          border: 2px solid #f3f3f3;
+          border-top: 2px solid #fff;
           border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          animation: spin 2s linear infinite;
+          width: 16px;
+          height: 16px;
+          animation: spin 1s linear infinite;
         }
         
         @keyframes spin {
