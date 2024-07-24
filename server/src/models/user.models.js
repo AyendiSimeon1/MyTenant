@@ -33,11 +33,13 @@ const userSchema = new mongoose.Schema({
   
 
 const propertySchema = new Schema({
-  address: { type: String, required: true },
-  type: { type: String, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
   agencyId: { type: Schema.Types.ObjectId, ref: 'Agency' },
   price: { type: String, required: true },
+  location: { type: String, required: true},
+  image: 
   formSubmissions: [{ type: Schema.Types.ObjectId, ref: 'FormSubmission' }],
 }, { timestamps: true });
 

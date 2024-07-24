@@ -17,7 +17,7 @@ const AllProperties =  async() => {
 
     useEffect(() => {
         const fetchProperty = async () => {
-            const url = 'http://localhost:3000/allProperies';
+            const url = 'http://localhost:3000/agent/properties';
         try {
             const response = await axios.get(url);
             setProperties(response.data);
