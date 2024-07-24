@@ -17,14 +17,14 @@ const Payment = () => {
     return 'MR-' + Math.random().toString(36).substr(2, 9).toUpperCase();
   };
 
-  useEffect(() => {
-    if (!formData.MerchantRef) {
-      setFormData((prevData) => ({
-        ...prevData,
-        MerchantRef: generateMerchantRef()
-      }));
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!formData.MerchantRef) {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       MerchantRef: generateMerchantRef()
+  //     }));
+  //   }
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

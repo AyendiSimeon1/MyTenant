@@ -40,8 +40,7 @@ const SubmittedForms = () => {
 
   useEffect(() => {
     fetchForms();
-    fetchAgencies();
-    fetchTemplates();
+   
     fetchProperties();
   }, []);
 
@@ -148,7 +147,7 @@ const SubmittedForms = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Submitted Forms</h1>
-      <div className="overflow-x-auto">
+      {/* <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead>
             <tr>
@@ -188,9 +187,9 @@ const SubmittedForms = () => {
             ))}
           </tbody>
         </table>
-      </div>
+      </div> */}
 
-      {selectedForm  (
+      {/* {selectedForm  (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
@@ -211,7 +210,7 @@ const SubmittedForms = () => {
             </div>
             <div className="px-6 py-4 flex-grow overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(selectedForm.data).map(([key, value]) => (
+                 {Object.entries(selectedForm.data).map(([key, value]) => (
                   <div key={key} className="mb-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">{key}</label>
                     <div className="bg-gray-50 px-3 py-2 rounded-md text-gray-900">{value}</div>
@@ -222,7 +221,7 @@ const SubmittedForms = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">{key}</label>
                     <div className="bg-gray-50 px-3 py-2 rounded-md text-gray-900">{value}</div>
                   </div>
-                ))}
+                ))} 
               </div>
             </div>
             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end space-x-3">
@@ -241,7 +240,7 @@ const SubmittedForms = () => {
             </div>
           </div>
         </Modal>
-      )}
+      )} */}
     </div>
   );
 };

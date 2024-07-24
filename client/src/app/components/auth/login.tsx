@@ -110,20 +110,20 @@ const LoginForm: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-lg text-2xl font-semibold text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-lg text-2xl font-semibold text-white bg-[#FFDAB9] hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
             disabled={loading}
           >
             {loading ? <ClipLoader size={24} color={"#ffffff"} /> : "Login"}
           </button>
 
-          <div className="text-center mt-4">
+          {/* <div className="text-center mt-4">
             <p className="text-gray-500 text-lg">
-              Don't have an account?{" "}
+              Don't have an account
               <Link href="/signup" className="text-orange-500 hover:underline">
                 Signup
               </Link>
             </p>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>

@@ -17,7 +17,7 @@ interface BookingCardProps {
 const BookingCard: React.FC<BookingCardProps> = ({ property }) => {
   return (
     <div className="max-w-sm rounded overflow-hidden shadow-lg bg-white">
-      <img className="w-full" src={property.imageUrl} alt={property.address} />
+      
       <div className="px-6 py-4">
         <div className="font-bold text-xl mb-2">{property.address}</div>
         <p className="text-gray-700 text-base">

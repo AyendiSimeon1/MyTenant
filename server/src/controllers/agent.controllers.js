@@ -30,9 +30,9 @@ const {
 
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-const apiKey = defaultClient.authentications['api-key'];
-apiKey.apiKey = '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';
-const apiInstance = new SibApiV3Sdk.EmailCampaignsApi();
+// const apiKey = defaultClient.authentications['api-key'];
+// apiKey.apiKey = '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';
+// const apiInstance = new SibApiV3Sdk.EmailCampaignsApi();
 
 const CYBERPAY_API_KEY = process.env.CYBERPAY_API_KEY;
 const CYBERPAY_INTEGRATION_KEY = process.env.CYBERPAY_INTEGRATION_KEY
@@ -154,14 +154,14 @@ const upload = multer({ storage: storage });
 
 const createAgencyProfile = async (req, res) => {
   try {
-      const { companyName, streetName, area, lga, state, userId } = req.body;
-      if (!companyName || !streetName || !area || !lga || !state || !userId) {
+      const { agencyName, officeAddress, userId } = req.body;
+      if (!agencyName || !officeAddress || !userId) {
           return res.status(400).json({ message: 'Missing required fields' });
       }
 
       const profilePicture = req.file ? req.file.filename : null;
 
-      const newAgency = new Agency({ companyName, streetName, area, lga, state, userId, profilePicture  });
+      const newAgency = new Agency({ agencyName, officeAddress,  userId, profilePicture  });
       await newAgency.save();
       res.status(201).json(newAgency);
   } catch (error) {

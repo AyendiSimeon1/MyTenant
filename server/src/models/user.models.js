@@ -22,15 +22,11 @@ const userSchema = new mongoose.Schema({
   });
 
   const agencySchema = new Schema({
-    companyName: String,
+    agencyName: String,
     logo: String,
-    streetName: String,
-    area: String,
-    lga: String,
-    state: String,
+    officeAddress: String,
     userId: { type: String, unique: true, sparse: true, ref: 'User' }, // Changed to String
     phone: String,
-    profilePicture: String, 
     properties: [{ type: Schema.Types.ObjectId, ref: 'Property' }],
     formSubmissions: [{ type: Schema.Types.ObjectId, ref: 'FormSubmission' }],
   }, { timestamps: true });

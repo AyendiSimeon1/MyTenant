@@ -4,33 +4,23 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { useUser } from '../../../userContext';
 import Link from 'next/link';
+import { ClipLoader } from 'react-spinners';
+import { FiUser, FiMapPin, FiHome, FiMap, FiFlag, FiImage } from 'react-icons/fi';
 
 interface AgencyFormData {
-  companyName: string;
-  streetName: string;
-  area: string;
-  lga: string;
-  state: string;
+  agencyName: string;
+  officeAddress: string;
   userId: string;
-  profilePicture: File | null;  // Added profile picture field
+  profilePicture: File | null;
 }
 
 const AgencyProfileSetup: React.FC = () => {
   const router = useRouter();
   const { user, setAgency, logContextData } = useUser();
 
-  useEffect(() => {
-    if (user) {
-      console.log('I am the user id', user.id);
-    }
-  }, [user]);
-
   const [formData, setFormData] = useState<AgencyFormData>({
-    companyName: '',
-    streetName: '',
-    area: '',
-    lga: '',
-    state: '',
+    agencyName: '',
+    officeAddress: '',
     userId: user?.id || '',
     profilePicture: null,
   });
@@ -40,7 +30,6 @@ const AgencyProfileSetup: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      console.log('User context updated:', user);
       setFormData((prevData) => ({
         ...prevData,
         userId: user.id,
@@ -62,19 +51,14 @@ const AgencyProfileSetup: React.FC = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    console.log('Form data being submitted:', formData);
+    setError(null);
 
     const formDataToSubmit = new FormData();
-    formDataToSubmit.append('companyName', formData.companyName);
-    formDataToSubmit.append('streetName', formData.streetName);
-    formDataToSubmit.append('area', formData.area);
-    formDataToSubmit.append('lga', formData.lga);
-    formDataToSubmit.append('state', formData.state);
-    formDataToSubmit.append('userId', formData.userId);
-    if (formData.profilePicture) {
-      formDataToSubmit.append('profilePicture', formData.profilePicture);
-    }
+    Object.entries(formData).forEach(([key, value]) => {
+      if (value !== null) {
+        formDataToSubmit.append(key, value);
+      }
+    });
 
     try {
       const response = await axios.post('http://127.0.0.1:3001/api/v1/agents/profile', formDataToSubmit, {
@@ -83,7 +67,6 @@ const AgencyProfileSetup: React.FC = () => {
         },
       });
       setAgency(response.data);
-      console.log('Agency profile setup successfully:', response.data);
       router.push('/dashboard');
     } catch (err: any) {
       console.error('Error setting up agency profile:', err);
@@ -94,127 +77,85 @@ const AgencyProfileSetup: React.FC = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="flex flex-col space-y-8 max-w-lg mx-auto p-10 bg-white shadow-2xl rounded-lg">
-        <h1 className="text-4xl font-bold text-center mb-8">Setup Agency Profile</h1>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="companyName" className="mb-3 text-xl font-medium text-gray-700">
-            Company Name
-          </label>
-          <input
-            type="text"
-            name="companyName"
-            id="companyName"
-            value={formData.companyName}
-            onChange={handleChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="streetName" className="mb-3 text-xl font-medium text-gray-700">
-            Street Name
-          </label>
-          <input
-            type="text"
-            name="streetName"
-            id="streetName"
-            value={formData.streetName}
-            onChange={handleChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="area" className="mb-3 text-xl font-medium text-gray-700">
-            Area
-          </label>
-          <input
-            type="text"
-            name="area"
-            id="area"
-            value={formData.area}
-            onChange={handleChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          />
-        </div>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="lga" className="mb-3 text-xl font-medium text-gray-700">
-            LGA
-          </label>
-          <select
-            name="lga"
-            id="lga"
-            value={formData.lga}
-            onChange={handleChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          >
-            <option value="" disabled>Select LGA</option>
-            <option value="LGA1">LGA1</option>
-            <option value="LGA2">LGA2</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="state" className="mb-3 text-xl font-medium text-gray-700">
-            State
-          </label>
-          <select
-            name="state"
-            id="state"
-            value={formData.state}
-            onChange={handleChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-            required
-          >
-            <option value="" disabled>Select State</option>
-            <option value="State1">State1</option>
-            <option value="State2">State2</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col relative">
-          <label htmlFor="profilePicture" className="mb-3 text-xl font-medium text-gray-700">
-            Profile Picture
-          </label>
-          <input
-            type="file"
-            name="profilePicture"
-            id="profilePicture"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="shadow-lg rounded-lg px-5 py-4 text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange focus:ring-opacity-50"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className={`w-full bg-orange text-white px-6 py-2 rounded-lg text-2xl font-semibold transition duration-200 shadow-lg hover:shadow-xl ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={loading}
-        >
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <div className="loader mr-2"></div>
-              Setting up...
-            </div>
-          ) : (
-            'Setup Agency'
-          )}
-        </button>
-
-        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-      </form>
-      <p className="text-gray-500 text-lg">
-        <Link href="/dashboard" className="text-orange-500 hover:underline">Go to dashboard</Link>
-      </p>
-      <button onClick={logContextData} className="bg-blue-500 text-white px-4 py-2 rounded">Log Context Data</button>
+    <div className="flex items-center justify-center bg-gradient-to-br from-orange-400 to-orange-600 px-8 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 backdrop-blur-sm"></div>
+      <div className="z-10 w-full pt-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-2xl overflow-hidden p-10 space-y-8">
+          <div className="text-center">
+            <h2 className="text-5xl font-bold text-gray-800 mb-2">Setup Agency Profile</h2>
+            <p className="text-gray-500 text-xl">Create your agency account</p>
+          </div>
+          
+          <div className="space-y-6">
+  <div className="relative">
+    <label htmlFor="companyName" className="text-xl font-medium text-gray-700 block mb-2">Agency Name</label>
+    <div className="relative">
+      <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+      <input
+        type="text"
+        name="agencyName"
+        id="agencyName"
+        value={formData.agencyName}
+        onChange={handleChange}
+        className="block w-full pl-12 pr-3 py-4 border border-gray-300 rounded-lg text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+        required
+      />
     </div>
+  </div>
+
+  <div className="flex space-x-4">
+    <div className="relative flex-1">
+      <label htmlFor="streetName" className="text-xl font-medium text-gray-700 block mb-2">Office Address</label>
+      <div className="relative">
+        <FiMapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+        <input
+          type="text"
+          name="officeAddress"
+          id="officeAddress"
+          value={formData.officeAddress}
+          onChange={handleChange}
+          className="block w-full pl-12 pr-3 py-4 border border-gray-300 rounded-lg text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+          required
+        />
+      </div>
+    </div>
+
+          <div className="relative">
+            <label htmlFor="profilePicture" className="text-xl font-medium text-gray-700 block mb-2">Logo</label>
+            <div className="relative">
+              <FiImage className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+              <input
+                type="file"
+                name="profilePicture"
+                id="profilePicture"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="block w-full pl-12 pr-3 py-4 border border-gray-300 rounded-lg text-gray-700 text-xl focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-150 ease-in-out"
+              />
+            </div>
+          </div>
+        </div>
+        </div>
+
+          {error && <p className="text-red-500 text-center mt-2">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-lg text-2xl font-semibold text-white bg-[#FFDAB9] hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500 focus:ring-opacity-50 transition duration-200 ease-in-out"
+            disabled={loading}
+          >
+            {loading ? <ClipLoader size={24} color={"#ffffff"} /> : "Setup Agency"}
+          </button>
+
+          <div className="text-center mt-4">
+            <Link href="/dashboard" className="text-orange-500 hover:underline text-lg">
+              Go to dashboard
+            </Link>
+          </div>
+        </form>
+      </div>
+    </div>
+    
   );
 };
 

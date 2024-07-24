@@ -15,9 +15,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(200).json(response.data);
     } catch (error: any) {
       const statusCode = error.response?.status || 500;
-      const message = error.response?.data?.message || 'An unexpected error occurred';
-
-      res.status(statusCode).json({ message });
+      if (error.response && error.response.data && error.response.data.error) {
+        const errorMsg = error.response.data.error;
+        console.log(errorMsg); 
+        res.status(statusCode).json({ errorMsg });
+        
+      } else {
+        console.log('An unexpected error occurred');
+       
+      }
+      
     }
   } else {
     res.setHeader('Allow', ['POST']);
