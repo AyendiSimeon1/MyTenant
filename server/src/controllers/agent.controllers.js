@@ -341,7 +341,7 @@ const initiatePayment = async (req, res) => {
     CustomerName,
     CustomerEmail,
     CustomerMobile,
-    IntegrationKey: "078b48a5c64442ddb63ac3d1f0604153",
+    IntegrationKey: "",
     ReturnUrl: "http://127.0.0.1:3000"
   };
 
@@ -350,7 +350,7 @@ const initiatePayment = async (req, res) => {
     maxBodyLength: Infinity,
     url: 'https://payment-api.staging.cyberpay.ng/api/v1/payments',
     headers: { 
-      'ApiKey': 'MDc4YjQ4YTVjNjQ0NDJkZGI2M2FjM2QxZjA2MDQxNTM=',
+      'ApiKey': '',
       'Content-Type': 'application/json'
     },
     data: JSON.stringify(paymentData)
