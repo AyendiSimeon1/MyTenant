@@ -59,7 +59,9 @@ const AllProperties =  async() => {
                 </a>
                 </Link>
             </div>
-            </div>
+        </div>
+            
+        
         })}
     </div>
 
