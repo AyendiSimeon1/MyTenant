@@ -28,10 +28,7 @@ const {
   Payment
 } = require('../models/user.models');
 
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-const CYBERPAY_API_KEY = process.env.CYBERPAY_API_KEY;
-const CYBERPAY_INTEGRATION_KEY = process.env.CYBERPAY_INTEGRATION_KEY
 
 const createFormController = async (req, res) => {
   try {
