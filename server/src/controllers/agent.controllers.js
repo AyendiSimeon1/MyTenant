@@ -30,10 +30,6 @@ const {
 
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-// const apiKey = defaultClient.authentications['api-key'];
-// apiKey.apiKey = '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';
-// const apiInstance = new SibApiV3Sdk.EmailCampaignsApi();
-
 const CYBERPAY_API_KEY = process.env.CYBERPAY_API_KEY;
 const CYBERPAY_INTEGRATION_KEY = process.env.CYBERPAY_INTEGRATION_KEY
 

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import DashboardHeader from '../components/dashboard/dashboardHeader';
-import Sidebar from '../components/dashboard/sidebar';
+import AllProperties from '../components/dashboard/allProperties';
 import withAuth from '../components/authMiddleware';
 import LogoutButton from '../components/auth/logoutButton';
 import { useUser } from '../../userContext';
@@ -126,6 +126,7 @@ const Dashboard: React.FC = () => {
             </ul>
           </div>
       </div>
+      <AllProperties />
      
       {/* <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} /> */}
       {/* <div className={`flex flex-col flex-grow transition-all duration-300 ${isOpen ? 'ml-64' : 'ml-0'}`}>
