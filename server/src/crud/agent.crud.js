@@ -8,6 +8,7 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient;
 
+
 const createForm = async ( title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields) => {
   try {
     const application = await prisma.Application.create({

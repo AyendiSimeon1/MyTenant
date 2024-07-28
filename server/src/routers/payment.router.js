@@ -1,4 +1,4 @@
-import { initiatePayment } from '../controllers/payment.controllers';
+import { initiatePayment } from '../utils/payments';
 const express = require('express');
 
 

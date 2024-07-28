@@ -243,58 +243,25 @@ const sendEmail = async (req, res) => {
   }
 };
 
-
-
-const userSubmitForm = async (req, res) => {
-  const { agencyId, templateId, propertyId, formData } = req.body;
-
+const submitApplication = async (req, res) => {
   try {
-    const newSubmission = new FormSubmission({
-      agencyId,
-      templateId,
-      propertyId,
-      data: formData,
+    const applicationData = req.body;
+    const newApplication = new Application(applicationData);
+    const savedApplication = newApplication.save();
+
+    res.status(201).json({
+      message: 'Application Saved',
+      application: savedApplication
+    })
+  } catch (error) {
+
+    console.log(error);
+    res.status(500).json({
+      message: 'Internal server error'
     });
-    await newSubmission.save();
-    res.status(201).json(newSubmission);
-    
-  } catch (error) {
-    console.error('Error submitting form:', error);
-    res.status(500).json({ error: 'Failed to submit form. Please try again later.' });
   }
-};
 
-const createTemplate = async (req, res) => {
-  try {
-    const { name, fields } = req.body;
-    if (!name || !fields) {
-      return res.status(400).json({ error: 'Name and fields are required' });
-    }
-    const newTemplate = new Template({ name, fields });
-    await newTemplate.save();
-    res.status(201).json(newTemplate);
-  } catch (error) {
-    console.error('Error creating template:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-const getTemplate = async (req, res) => {
-  const { templateId } = req.params;
-
-  try {
-    const template = await Template.findById(templateId);
-    if (!template) {
-      return res.status(404).json({ error: 'Template not found' });
-    }
-    res.status(200).json(template);
-  } catch (error) {
-    console.error('Error fetching template:', error);
-    res.status(500).json({ error: 'Failed to fetch template. Please try again later.' });
-  }
-};
-
-
+}
 
 const submitReference = async (req, res) => {
   const { formSubmissionId, name, phone, email, contactInfo, relationship, additionalDetails, identityDocument } = req.body;
@@ -420,41 +387,6 @@ const sendRefrenceSms = async (req, res) => {
   });
 };
 
-const sendApprovalMail = async (req, res) => {
-  try {
-    const { email, formId } = req.body;
-    const link = "http://127.0.0.1:3000/dashboard/initiate-payment";
-    if (!email || !formId) {
-      return res.status(400).json({ message: 'Missing required parameters' });
-    }
-
-    const transporter = nodemailer.createTransport({
-      host: 'smtp-relay.brevo.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: '75a4e9001@smtp-brevo.com',
-        pass: 'Q8BvNpJ9GFaIZg0x',
-      },
-    });
-
-    const mailOptions = {
-      from: 'Dev@mytenant.ng',
-      to: email,
-      subject: 'Form Approved - Next Steps',
-      html: `
-        <p>Hello,</p>
-        <p>Your form has been approved. Click the following link to proceed: ${link} </p>
-        <p><a href="${link}">Link</a></p>
-      `,
-    };
-    const info = await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: 'Email sent successfully' });
-  } catch (error) {
-    console.error('Error sending email:', error);
-    res.status(500).json({ message: 'Failed to send email' });
-  }
-};
 
 const getUsers = async (req, res) => {
   try {
@@ -474,14 +406,20 @@ const getProperties = async (req, res) => {
   }
 };
 
-const getPayments = async (req, res) => {
+const applyForProperty = async (req, res) => {
+  const data = req.body;
   try {
-    const payments = await Payment.find();
-    res.status(200).json(payments);
+    const newApplication = await new Application(data);
+    newApplication.save();
+
+    const unpdateProperty = await Property.findByIdAndUpdate(propertyId, { $push: { applications: application._id } });
+    res.status(201).json({ message: 'Application submitted successfully', application }); 
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching payments', error });
+    console.log(error);
+    res.status(500).json({ message: 'Error submitting application', error });
   }
-};
+}
+
 
 module.exports = { createFormController, 
                     getApplicationByIdController, 
@@ -493,21 +431,17 @@ module.exports = { createFormController,
                     createProperty,
                     getAllProperties,
                     sendEmail,
-                    userSubmitForm,
-                    getTemplate,
+                    submitApplication,
                     sendRefrenceSms,
                     submitReference,
-                    createTemplate,
                     updateFormSubmissionStatus,
                     initiatePayment,
                     getAllSubmitedForm,
-                    sendApprovalMail,
                     getUsers,
                     getProperties,
-                    getPayments,
                     getProperty,
-                    getAgent
-
+                    getAgent,
+                    applyForProperty
                   };
 
 

@@ -39,8 +39,7 @@ const propertySchema = new Schema({
   agencyId: { type: Schema.Types.ObjectId, ref: 'Agency' },
   price: { type: String, required: true },
   location: { type: String, required: true},
-  image: 
-  formSubmissions: [{ type: Schema.Types.ObjectId, ref: 'FormSubmission' }],
+  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
 }, { timestamps: true });
 
 
@@ -74,28 +73,83 @@ const referenceSchema = new Schema({
   formSubmissionId: { type: Schema.Types.ObjectId, unique: true, sparse: true, ref: 'FormSubmission' },
 }, { timestamps: true });
 
-const applicationSchema = new Schema({
-  title: { type: String, required: true },
-  logoUrl: String,
-  status: String,
-  createdAt: { type: Date, default: Date.now },
-  agentId: { type: Schema.Types.ObjectId, ref: 'User' },
-  fields: Schema.Types.Mixed,
-  uniqueLink: String,
-  submissions: [{ type: Schema.Types.ObjectId, ref: 'SubmittedApplication' }],
-}, { timestamps: true });
+const applicationSchema = new mongoose.Schema({
+  personalInfo: {
+    fullName: { type: String, required: true },
+    dateOfBirth: { type: Date, required: true },
+    gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
+    maritalStatus: { type: String, enum: ['Single', 'Married', 'Divorced', 'Widowed'], required: true },
+    nationality: { type: String, default: 'Nigerian' },
+    stateOfOrigin: { type: String, required: true },
+    lga: { type: String, required: true }, // Local Government Area
+  },
 
-const submittedApplicationSchema = new Schema({
-  applicationId: { type: Schema.Types.ObjectId, ref: 'Application' },
-  fields: Schema.Types.Mixed,
-}, { timestamps: true });
+  contactInfo: {
+    phoneNumber: { type: String, required: true },
+    alternatePhoneNumber: { type: String },
+    email: { type: String, required: true },
+    currentAddress: { type: String, required: true },
+  },
+
+  identificationInfo: {
+    idType: { type: String, enum: ['National ID', 'Voters Card', 'Drivers License', 'International Passport'], required: true },
+    idNumber: { type: String, required: true },
+    bvn: { type: String, required: true }, // Bank Verification Number
+    nin: { type: String }, // National Identification Number
+  },
+
+  employmentInfo: {
+    occupation: { type: String, required: true },
+    employerName: { type: String },
+    employerAddress: { type: String },
+    monthlyIncome: { type: Number, required: true },
+  },
+
+  propertyPreferences: {
+    desiredLocation: { type: String, required: true },
+    propertyType: { type: String, enum: ['Flat', 'Duplex', 'Bungalow', 'Self-Contain', 'Shared Apartment'], required: true },
+    maxRent: { type: Number, required: true },
+    preferredMoveInDate: { type: Date },
+  },
+
+  guarantorInfo: {
+    fullName: { type: String, required: true },
+    relationship: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    email: { type: String },
+    address: { type: String, required: true },
+    occupation: { type: String, required: true },
+  },
+
+  additionalInfo: {
+    hasPets: { type: Boolean, default: false },
+    smoker: { type: Boolean, default: false },
+    previousEvictions: { type: Boolean, default: false },
+    criminalRecord: { type: Boolean, default: false },
+  },
+
+  documents: {
+    passportPhoto: { type: String }, // URL to uploaded passport photo
+    proofOfIncome: { type: String }, // URL to uploaded document
+    idCardScan: { type: String }, // URL to uploaded ID scan
+  },
+
+  applicationStatus: {
+    type: String,
+    enum: ['Pending', 'Under Review', 'Approved', 'Rejected'],
+    default: 'Pending'
+  },
+
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+
 
 const paymentSchema = new Schema({
-  tenantId: { type: Schema.Types.ObjectId, ref: 'User' },
+  applicationId: { type: Schema.Types.ObjectId, ref: 'Application', required: true },
   amount: { type: Number, required: true },
-  status: { type: String, default: 'pending' },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
+  status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
+  paymentDate: { type: Date, default: Date.now },
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
@@ -105,7 +159,6 @@ const Template = mongoose.model('Template', templateSchema);
 const FormSubmission = mongoose.model('FormSubmission', formSubmissionSchema);
 const Reference = mongoose.model('Reference', referenceSchema);
 const Application = mongoose.model('Application', applicationSchema);
-const SubmittedApplication = mongoose.model('SubmittedApplication', submittedApplicationSchema);
 const Payment = mongoose.model('Payment', paymentSchema);
 
 module.exports = {
@@ -116,6 +169,5 @@ module.exports = {
   FormSubmission,
   Reference,
   Application,
-  SubmittedApplication,
   Payment
 };
