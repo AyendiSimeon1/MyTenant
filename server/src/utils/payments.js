@@ -1,5 +1,7 @@
 const https = require('https');
+require('dotenv').config;
 
+const paystack_secret_key = process.env.PAYSTACK_SECRET_KEY;
 const initiatePayment = () => {
     const params = JSON.stringify({
         "email": "ayendisimeon3@gmail.com",
@@ -13,7 +15,7 @@ const initiatePayment = () => {
         path: '/transaction/initialize',
         method: 'POST',
         headers: {
-            Authorization: `Bearer SECRET_KEY`,
+            Authorization: `Bearer sk_test_d302885900cb8234664c32e14531f5e0a11c363e`,
             'Content-type': 'application/json'
         }
     }
@@ -36,4 +38,4 @@ const initiatePayment = () => {
       req.end()
 };
 
-module.exports  initiatePayment ;
+module.exports = { initiatePayment };
