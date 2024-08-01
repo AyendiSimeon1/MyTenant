@@ -1,40 +1,28 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient;
+const { Application, user, payment } = require('../models/user.models');
 
-const getTenantById = async (id) => {
-    return await prisma.user.findUnique({ where: { id } });
-  };
 
-  const submitApplication = async (applicationId, submissionData) => {
-    return await prisma.submittedApplication.create({
-      data: {
-        ...submissionData,
-        applicationId,
-      },
+const getTenantApplication = async(req, res) => {
+  const { tenantId } = req.body;
+  const { applicationId } = req.body;
+  try {
+    application = await Application.find()
+    
+    if (!application) {
+      res.status(404).json({
+        message: 'Application does not exist'
+      });
+    }
+    res.status(200).json({
+      body: application
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'Internal Server Error',
+      error: error
     });
   };
-  
-  const updateApplicationIdDocument = async (tenantId, idDocument) => {
-    return await prisma.application.update({
-      where: { tenantId },
-      data: { idDocument },
-    });
-  };
+};
 
-  const createPayment = async (tenantId, amount) => {
-    return await prisma.payment.create({
-      data: {
-        tenantId,
-        amount,
-        status: 'completed',
-      },
-    });
-  };
-  const updateApplicationStatus = async (id, status) => {
-    return await prisma.application.update({
-      where: { id },
-      data: { status },
-    });
-  };
-  
-  module.exports = { submitApplication, getTenantById }
+module.exports = {
+  getTenantApplication
+};
