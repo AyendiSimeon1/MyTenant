@@ -3,10 +3,11 @@ require('dotenv').config;
 
 const paystack_secret_key = process.env.PAYSTACK_SECRET_KEY;
 const initiatePayment = () => {
+  const { email, amount, subaccount, applicationId } = req.body;
     const params = JSON.stringify({
-        "email": "ayendisimeon3@gmail.com",
-        "amount": "20000",
-        "subaccount": "ACCT_x81g7u5z0fkkbyn"
+        email: email,
+        amount: amount * 100,
+        subaccount: subaccount
     });
     
     const options = {
@@ -27,8 +28,21 @@ const initiatePayment = () => {
           data += chunk
         });
       
-        res.on('end', () => {
-          console.log(JSON.parse(data))
+        res.on('end', async () => {
+          console.log(JSON.parse(data));
+
+          if (response.status) {
+            await Application.findByIdAndUpdate(applicaionId, {
+              $push: {
+                payments: {
+                  amount,
+                  date: new Date(),
+                  refrence: response.data.reference
+                }
+              }
+            });
+            res.status(200).json(response)
+          }
         })
       }).on('error', error => {
         console.error(error)

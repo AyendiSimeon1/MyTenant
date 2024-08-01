@@ -3,6 +3,6 @@ const { submitApplicationController } = require('../controllers/tenants.controll
 
 const tenantRouter = express.Router()
 
-tenantRouter.post("/onboarding/:id", submitApplicationController);
+// tenantRouter.post("/onboarding/:id", submitApplicationController);
 
 module.exports = { tenantRouter };

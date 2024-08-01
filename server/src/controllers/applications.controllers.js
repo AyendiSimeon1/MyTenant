@@ -18,6 +18,8 @@ const updateApplication = async (req, res) => {
     }
 };
 
+
+
 const approvedApplication = async (req, res) => {
     
     try {

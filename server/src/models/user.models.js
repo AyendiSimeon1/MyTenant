@@ -74,6 +74,8 @@ const referenceSchema = new Schema({
 }, { timestamps: true });
 
 const applicationSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true }, // Add propertyId to link to the property
   personalInfo: {
     fullName: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
@@ -83,35 +85,30 @@ const applicationSchema = new mongoose.Schema({
     stateOfOrigin: { type: String, required: true },
     lga: { type: String, required: true }, // Local Government Area
   },
-
   contactInfo: {
     phoneNumber: { type: String, required: true },
     alternatePhoneNumber: { type: String },
     email: { type: String, required: true },
     currentAddress: { type: String, required: true },
   },
-
   identificationInfo: {
     idType: { type: String, enum: ['National ID', 'Voters Card', 'Drivers License', 'International Passport'], required: true },
     idNumber: { type: String, required: true },
     bvn: { type: String, required: true }, // Bank Verification Number
     nin: { type: String }, // National Identification Number
   },
-
   employmentInfo: {
     occupation: { type: String, required: true },
     employerName: { type: String },
     employerAddress: { type: String },
     monthlyIncome: { type: Number, required: true },
   },
-
   propertyPreferences: {
     desiredLocation: { type: String, required: true },
     propertyType: { type: String, enum: ['Flat', 'Duplex', 'Bungalow', 'Self-Contain', 'Shared Apartment'], required: true },
     maxRent: { type: Number, required: true },
     preferredMoveInDate: { type: Date },
   },
-
   guarantorInfo: {
     fullName: { type: String, required: true },
     relationship: { type: String, required: true },
@@ -120,37 +117,30 @@ const applicationSchema = new mongoose.Schema({
     address: { type: String, required: true },
     occupation: { type: String, required: true },
   },
-
   additionalInfo: {
     hasPets: { type: Boolean, default: false },
     smoker: { type: Boolean, default: false },
     previousEvictions: { type: Boolean, default: false },
     criminalRecord: { type: Boolean, default: false },
   },
-
   documents: {
     passportPhoto: { type: String }, // URL to uploaded passport photo
     proofOfIncome: { type: String }, // URL to uploaded document
     idCardScan: { type: String }, // URL to uploaded ID scan
   },
-
   applicationStatus: {
     type: String,
     enum: ['Pending', 'Under Review', 'Approved', 'Rejected'],
     default: 'Pending'
   },
-
+  payments: [{
+    amount: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
+    reference: { type: String, required: true }
+  }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
-
-
-const paymentSchema = new Schema({
-  applicationId: { type: Schema.Types.ObjectId, ref: 'Application', required: true },
-  amount: { type: Number, required: true },
-  status: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
-  paymentDate: { type: Date, default: Date.now },
-}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 const Agency = mongoose.model('Agency', agencySchema);
