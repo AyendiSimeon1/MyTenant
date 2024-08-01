@@ -1,6 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const nodemailer = require('nodemailer');
-const SibApiV3Sdk = require('sib-api-v3-sdk');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 const axios = require('axios');
 const multer = require('multer');
 const path = require('path');
@@ -13,7 +12,9 @@ const { createForm,
         updateApplications, 
         updateApplicationStatus,
         createFormLink,
-        createAgency
+        createAgency,
+        getRecieptData 
+        
       } = require('../crud/agent.crud');
 
 const {
@@ -24,23 +25,12 @@ const {
   FormSubmission,
   Reference,
   Application,
-  SubmittedApplication,
-  Payment
+
 } = require('../models/user.models');
 
 
 
-const createFormController = async (req, res) => {
-  try {
-      const { title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields } = req.body;
-      const form = new Form({ title, logoUrl, status, propertyAddress, leaseStartDate, leaseEndDate, fields });
-      await form.save();
-      res.json(form);
-  } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: 'Failed to create form' });
-  }
-};
+
 
 const getAgent = async (req, res) => {
   try {
@@ -247,7 +237,55 @@ const getPaymentsForApprovedApplications = async (req, res) => {
   }
 };
 
-module.exports = { createFormController, 
+const generateReciept = (recieptData, filepath) => {
+  const doc = new PDFDocument();
+  doc.pipe(fs.createWriteStream(filePath));
+  doc.fontSize(25).text('Invoice', { align: 'center'});
+  doc.fontSize(20).text('User Details', { underline: true });
+  doc.fontSize(15).text(`Name: ${receiptData.user.firstName} ${receiptData.user.lastName}`);
+  doc.text(`Email: ${receiptData.user.email}`);
+  doc.text(`Phone: ${receiptData.user.contactInfo.phoneNumber}`);
+
+  doc.moveDown();
+
+  doc.fontSize(20).text('Property Details', { underline: true });
+  doc.fontSize(15).text(`Title: ${receiptData.property.title}`);
+  doc.text(`Description: ${receiptData.property.description}`);
+  doc.text(`Location: ${receiptData.property.location}`);
+  doc.text(`Price: ${receiptData.property.price}`);
+
+  doc.moveDown();
+
+  doc.fontSize(20).text('Agent Details', { underline: true });
+  doc.fontSize(15).text(`Name: ${receiptData.agent.firstName} ${receiptData.agent.lastName}`);
+  doc.text(`Agency: ${receiptData.property.agencyId.agencyName}`);
+  doc.text(`Email: ${receiptData.agent.email}`);
+  doc.text(`Phone: ${receiptData.agent.phoneNumber}`);
+
+  doc.moveDown();
+
+  doc.fontSize(20).text('Payment Details', { underline: true });
+  doc.fontSize(15).text(`Amount: ${receiptData.payment.amount}`);
+  doc.text(`Date: ${receiptData.payment.date}`);
+  doc.text(`Reference: ${receiptData.payment.reference}`);
+
+  doc.end();
+}
+
+const getReciept = (req, res) => {
+  const { recieptId } = req.params;
+  const receiptPath = path.join(__dirname, `../reciepts/receipt_${receiptId}.pdf`);
+  res.sendFile(receiptPath, err => {
+    if(err) {
+      console.error(err)
+      res.status(404).json({ message: 'Reciept not found' });
+    }
+  });
+}
+
+
+
+module.exports = { 
                     getAllApplicationsForAgent,
                     updateApplicationStatus,
                     getUsers,
@@ -257,7 +295,8 @@ module.exports = { createFormController,
                     applyForProperty,
                     getApprovedApplicationsForAgent,
                     getRejectedApplicationsForAgent,
-                    getPaymentsForApprovedApplications
+                    getPaymentsForApprovedApplications,
+                    getReciept
                   };
 
 

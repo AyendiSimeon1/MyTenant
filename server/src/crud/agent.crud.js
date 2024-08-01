@@ -94,6 +94,19 @@ const createFormLink = async (applicationId) => {
       data: newData,
     });
   };
+
+const getRecieptData = async (applicationId) => {
+  const application = await Application.findById(applicationId).populate('userId').populate('propertyId');
+  const property = await Property.findById(application.propertyId._id).populate('agencyId');
+  const agent = User.findById(property.agencyId.userId);
+
+  return {
+    user: application.userId,
+    property,
+    agent,
+    payment: application.payments[application.payments.length - 1]
+  }
+}
   
 module.exports = { createForm,
                      createFormLink, 
@@ -101,5 +114,6 @@ module.exports = { createForm,
                      updateApplicationStatus, 
                      getAllApplication,
                      updateApplications,
-                     createAgency 
+                     createAgency,
+                     getRecieptData 
                     };

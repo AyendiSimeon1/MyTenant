@@ -1,5 +1,7 @@
 const https = require('https');
 require('dotenv').config;
+const path = require('path');
+const { getReceiptData, generateReceipt } = require('./receiptUtils');
 
 const paystack_secret_key = process.env.PAYSTACK_SECRET_KEY;
 const initiatePayment = () => {
@@ -31,17 +33,28 @@ const initiatePayment = () => {
         res.on('end', async () => {
           console.log(JSON.parse(data));
 
-          if (response.status) {
-            await Application.findByIdAndUpdate(applicaionId, {
+          if (paystackResponse.status) {
+            // Store the payment reference in the application
+            const updatedApplication = await Application.findByIdAndUpdate(applicationId, {
               $push: {
                 payments: {
                   amount,
                   date: new Date(),
-                  refrence: response.data.reference
+                  reference: paystackResponse.data.reference
                 }
               }
-            });
-            res.status(200).json(response)
+            }, { new: true }).populate('userId').populate('propertyId');
+    
+            // Get the latest payment information
+            const paymentData = await getReceiptData(applicationId);
+    
+            // Generate the receipt PDF
+            const receiptPath = path.join(__dirname, `../receipts/receipt_${applicationId}.pdf`);
+            generateReceipt(paymentData, receiptPath);
+    
+            res.status(200).json({ message: 'Payment successful and receipt generated', receiptPath });
+          } else {
+            res.status(400).json(paystackResponse);
           }
         })
       }).on('error', error => {
