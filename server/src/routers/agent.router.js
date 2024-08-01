@@ -10,6 +10,7 @@ const {
     getProperties,
     getAgent,
     getProperty,
+    getPaymentsForApprovedApplications
    
  } = require('../controllers/agent.controllers');
 
@@ -23,6 +24,7 @@ agentRouter.post("/change-application-status", updateApplicationStatus)
 
 agentRouter.post('/profile',  upload.single('profilePicture'), createAgencyProfile);
 
+agentRouter.get('/get-approved-payment', getPaymentsForApprovedApplications);
 
 
 

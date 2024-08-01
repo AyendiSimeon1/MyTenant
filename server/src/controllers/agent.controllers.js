@@ -218,6 +218,35 @@ const getRejectedApplicationsForAgent = async (req, res) => {
   }
 };
 
+const getPaymentsForApprovedApplications = async (req, res) => {
+  try {
+    const { agentId } = req.body;
+
+    const { propertyId } = req.body;
+
+    const property =  await Property.findOne({ _id: propertyId, agencyId: agencyId });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found or not mannaged by this agent'});
+
+    }
+
+    const approvedApplications = await Application.find({
+      propertyId,
+      applicationStatus: 'Approved'
+    }).populate('payments');
+    
+    const payments = approvedApplications.reduce((acc, application) => {
+      return acc.concat(application.payments);
+    }, []);
+
+    res.status(200).json({ payments });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Error fetching payments for approved applications', error });
+  }
+};
+
 module.exports = { createFormController, 
                     getAllApplicationsForAgent,
                     updateApplicationStatus,
@@ -227,7 +256,8 @@ module.exports = { createFormController,
                     getAgent,
                     applyForProperty,
                     getApprovedApplicationsForAgent,
-                    getRejectedApplicationsForAgent
+                    getRejectedApplicationsForAgent,
+                    getPaymentsForApprovedApplications
                   };
 
 
