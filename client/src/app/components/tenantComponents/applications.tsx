@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-const allApplications = async () => { 
+const AllApplications = async () => { 
 
   const router = useRouter();
   const [applications, setApplications] = useState([]);
@@ -17,4 +17,4 @@ const allApplications = async () => {
     <h1>Hello</h1>
         )
   };
-export default allApplications;
+export default AllApplications;
