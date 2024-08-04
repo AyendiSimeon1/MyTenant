@@ -10,8 +10,8 @@ const RejectedApplications = () => {
         const fetchApplications = async () => {
             
             try {
-                url = '127.0.0.1:3000/applications/rejected-applications';
-                const response = await axios.get(url);
+                
+                const response = await axios.get('127.0.0.1:3000/applications/rejected-applications');
                 setApplications(response.data);
             } catch (error) {
                 console.log(error);

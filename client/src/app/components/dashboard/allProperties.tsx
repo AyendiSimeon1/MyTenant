@@ -37,12 +37,7 @@ const AllProperties =  () => {
         {properties.map((property, index) => (
         <div key='index' className="max-w-sm rounded-lg overflow-hidden shadow-md bg-white">
             <div className="relative h-48 w-full">
-                <Image
-                src={property.image}
-                alt={property.title}
-                layout="fill"
-                objectFit="cover"
-                />
+                
             </div>
             <div className="px-6 py-4">
                 <div className="font-bold text-xl mb-2">{property.title}</div>

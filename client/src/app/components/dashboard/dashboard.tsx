@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import DashboardHeader from './dashboardHeader';
-import StatCard from './statCard';
-import Sidebar from './sidebar';
+
 import withAuth from '../authMiddleware';
 import LogoutButton from '../auth/logoutButton';
 import { useUser } from '../../../userContext';

@@ -1,6 +1,6 @@
-import { useState, useEffet } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import axois from 'axios';
+import axios from 'axios';
 
 const allApplications = async () => { 
 

@@ -28,11 +28,11 @@ const Applications = () => {
         <div>
             <h1>All Applications</h1>
 
-            {applications.map((application, index) => {
+            {/* {applications.map((application, index) => {
                 <div key={index}> 
                     <h1>{application.title}</h1>
                 </div>
-            })};
+            })}; */}
         </div>
     )
 }
