@@ -14,15 +14,7 @@ const allApplications = async () => {
     fetchApplications();
   })
   return (
-    <div>
-      <h1>All Applications</h1>
-      {applictions.map((application) => (
-        <div key={application._id}>
-          <h2>{application.name}</h2>
-          <p>{application.email}</p>
-          )}
-          
-      <div>
+    <h1>Hello</h1>
         )
   };
 export default allApplications;

@@ -1,6 +1,6 @@
-import { useState, useEffet } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import axois from 'axios';
+import axios from 'axios';
 
 const allApplications = async () => { 
 
@@ -16,13 +16,9 @@ const allApplications = async () => {
   return (
     <div>
       <h1>All Applications</h1>
-      {applictions.map((application) => (
-        <div key={application._id}>
-          <h2>{application.name}</h2>
-          <p>{application.email}</p>
-          )}
+  
 
-      <div>
+      </div>
         )
   };
 export default allApplications;
