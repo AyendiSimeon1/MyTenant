@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const mailgun = require('mailgun-js');
+
 
 const prisma = new PrismaClient
 const createForm = async (formData) => {
@@ -98,43 +98,6 @@ const addRefrence = async (formData) => {
   
 
 }
-
-const sendEmailNotification = async (recipientEmail, createdReference) => {
-  // Replace with your actual Mailgun API key and domain
-  const mg = mailgun.createClient({
-    apiKey: process.env.MAILGUN_API_KEY,
-    domain: process.env.MAILGUN_DOMAIN
-  });
-
-  // Craft the email content (same as in previous response)
-  const emailContent = `
-    <h2>Reference Request for ${createdReference.tenantName} (if applicable)</h2>
-    <p>Dear ${recipientEmail},</p>
-    <p>You have been added as a reference for (if applicable) on our platform.</p>
-    <p>We may contact you soon to verify your relationship with ${createdReference.tenantName} and gather your feedback.</p>
-    <p>Thank you for your time and cooperation.</p>
-    <p>Sincerely,</p>
-    <p>Your Platform Name Team</p>
-  `;
-
-  // Define the email message data
-  const mailData = {
-    from: 'Your Platform Name <your_email@example.com>', 
-    to: recipientEmail,
-    subject: 'Reference Request for Tenant Application',
-    html: emailContent 
-  };
-
-  // Send the email using Mailgun API
-  try {
-    const response = await mg.messages().send(mailData);
-    console.log('Email sent:', response);
-  } catch (error) {
-    console.error('Error sending email:', error);
-
-  }
-};
-
 
 const referenceForm =  async (req, res) => {
   const { firstName, lastName, email, phoneNumber, occupation, relationToTenant } = req.body;
