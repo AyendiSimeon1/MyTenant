@@ -1,155 +1,224 @@
+// pages/dashboard.js
 "use client";
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import AllProperties from '../components/dashboard/allProperties';
-import Applications from '../components/dashboard/applications';
-import RejectedApplications from '../components/dashboard/RejectedApplications';
-import SuccessfulPayments from '../components/dashboard/SuccessfulPayments';
-import PendingInspections from '../components/dashboard/pendingInspections';
-import ApprovedApplications from '../components/dashboard/approvedApplications';
-import withAuth from '../components/authMiddleware';
-import { useUser } from '../../userContext';
-import Link from 'next/link';
-import SubmittedForm from '../components/dashboard/formComponent';
+import React, { useState } from 'react';
+import {
+  HomeIcon,
+  UserGroupIcon,
+  DocumentTextIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  CashIcon,
+  SearchIcon,
+  BellIcon,
+  MenuAlt2Icon,
+} from '@heroicons/react/outline';
+import { UserCircleIcon } from '@heroicons/react/solid';
 
+// Dummy data (replace with real data from your API)
+const summaryData = [
+  { title: 'Total Applications', value: 101, icon: DocumentTextIcon },
+  { title: 'Reviewed Applications', value: 180, icon: CheckCircleIcon },
+  { title: 'Pending Inspections', value: 13, icon: HomeIcon },
+  { title: 'Total Tenants', value: 10, icon: UserGroupIcon },
+];
 
-type Property = {
-  _id: string;
-  address: string;
-  type: string;
-  createdAt: string;
-  agencyId: string;
-  imageUrl: string;
-};
+const recentApplications = [
+  { id: 1, name: 'John Doe', property: '123 Main St', status: 'Pending' },
+  { id: 2, name: 'Jane Smith', property: '456 Elm St', status: 'Approved' },
+  { id: 3, name: 'Bob Johnson', property: '789 Oak St', status: 'Rejected' },
+];
 
-const Dashboard: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [activeComponent, setActiveComponent] = useState('all-properties');
-
-  const { user, agency } = useUser();
-  const router = useRouter();
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  function getFormattedDate() {
-    const date = new Date();
-    
-    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July',
-      'August', 'September', 'October', 'November', 'December'
-    ];
-  
-    const weekday = weekdays[date.getDay()];
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-  
-    return `${weekday}, ${day} ${month} ${year}`;
-  }
-
-  useEffect(() => {
-    if (agency && agency._id) {
-      axios.get(`http://127.0.0.1:3001/api/v1/agents/properties/${agency._id}`)
-        .then(response => {
-          setProperties(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching properties:', error);
-        });
-    }
-  }, [agency]);
-
-  const renderComponent = () => {
-    switch (activeComponent) {
-      case 'all-properties':
-        return <AllProperties />;
-      case 'applications':
-        return <Applications />;
-      case 'approved-applications':
-        return <ApprovedApplications />;
-      case 'rejected-applications':
-        return <RejectedApplications />;
-      case 'successful-payments':
-        return <SuccessfulPayments />;
-      case 'pending-inspections':
-        return <PendingInspections />;
-     
-      default:
-        return <AllProperties />;
-    }
-  };
-
-  console.log('Agency:', agency);
+const Dashboard = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-8 mx-5">
-      <div className='flex px-5 border-b-2'>
-        <h1 className='font-bold text-xl'>MyTenant</h1>
-      </div>
-      <div className='px-5 pt-5'>
-        <h1 className='font-bold'>{getFormattedDate()}</h1>
-        <h1 className='font-bold'>Welcome Back,</h1>
-        <p className='text-slate'>This is property portfolio report</p>
-        <div className='flex justify-between pt-4'>
-          <div className='border-2 border-current p-10 m-2 rounded-lg' onClick={() => setActiveComponent('applications')}>
-            <p>Total Applications</p>
-            <p className='font-bold'>101</p>
-          </div>
-          <div className='border-2 border-current m-2 p-10 rounded-lg' onClick={() => setActiveComponent('approved-applications')}>
-            <p>Reviewed Applications</p>
-            <p className='font-bold'>180</p>
-          </div>
-          <div className='border-2 border-current m-2 p-10 rounded-lg' onClick={() => setActiveComponent('pending-inspections')}>
-            <p>Pending Inspection</p>
-            <p className='font-bold'>13</p>
-          </div>
-          <div className='border-2 border-current m-2 p-10 rounded-lg' onClick={() => setActiveComponent('total-tenants')}>
-            <p>Total Tenants</p>
-            <p className="font-bold">10</p>
-          </div>
+    <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
+      <aside
+        className={`${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
+      >
+        <div className="flex items-center justify-center h-16 bg-gray-900">
+          <h1 className="text-white text-2xl font-bold">MyTenant</h1>
         </div>
-        <div className="mt-4 font-weight-medium">
-          <ul className="flex justify-between space-x-4 border-b-2">
-            <li onClick={() => setActiveComponent('all-properties')}>
-              <a href="#" className="text-gray-800 flex items-center">
-                <i className="fas fa-home mr-2"></i>
-                All Properties
-              </a>
-            </li>
-            <li onClick={() => setActiveComponent('applications')}>
-              <a href="#" className="text-gray-800 flex items-center">
-                <i className="fas fa-file-alt mr-2"></i>
-                Applications
-              </a>
-            </li>
-            <li onClick={() => setActiveComponent('approved-applications')}>
-              <a href="#" className="text-gray-800 flex items-center">
-                <i className="fas fa-check-circle mr-2"></i>
-                Approved Applications
-              </a>
-            </li>
-            <li onClick={() => setActiveComponent('rejected-applications')}>
-              <a href="#" className="text-gray-800 flex items-center">
-                <i className="fas fa-times-circle mr-2"></i>
-                Rejected Applications
-              </a>
-            </li>
-            <li onClick={() => setActiveComponent('successful-payments')}>
-              <a href="#" className="text-gray-800 flex items-center">
-                <i className="fas fa-money-check-alt mr-2"></i>
-                Successful Payment
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      {renderComponent()}
-    </div>
-  )};
+        <nav className="mt-8">
+          {/* <NavItem icon={HomeIcon} title="Dashboard" active />
+          <NavItem icon={DocumentTextIcon} title="Applications" />
+          <NavItem icon={CheckCircleIcon} title="Approved" />
+          <NavItem icon={XCircleIcon} title="Rejected" />
+          <NavItem icon={CashIcon} title="Payments" /> */}
+        </nav>
+      </aside>
 
-  export default Dashboard;
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white shadow-sm lg:static">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="relative flex items-center justify-between h-16">
+              <div className="flex items-center lg:hidden">
+                <button
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                >
+                  <MenuAlt2Icon className="h-6 w-6" />
+                </button>
+              </div>
+              <div className="flex-1 flex items-center justify-center lg:justify-end">
+                <div className="max-w-lg w-full lg:max-w-xs">
+                  <label htmlFor="search" className="sr-only">
+                    Search
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <SearchIcon className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="search"
+                      name="search"
+                      className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="Search"
+                      type="search"
+                    />
+                  </div>
+                </div>
+                <button className="ml-4 bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  <BellIcon className="h-6 w-6" />
+                </button>
+                <div className="ml-4 relative flex-shrink-0">
+                  <UserCircleIcon className="h-8 w-8 text-gray-400" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto bg-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+            
+            {/* Summary Cards */}
+            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {summaryData.map((item) => (
+                <SummaryCard key={item.title} {...item} />
+              ))}
+            </div>
+
+            {/* Charts */}
+            <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Applications Over Time
+                  </h3>
+                  {/* Add your chart component here */}
+                  <div className="mt-4 h-48 bg-gray-200 rounded flex items-center justify-center">
+                    Chart Placeholder
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="p-5">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Application Status Distribution
+                  </h3>
+                  {/* Add your chart component here */}
+                  <div className="mt-4 h-48 bg-gray-200 rounded flex items-center justify-center">
+                    Chart Placeholder
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Recent Applications Table */}
+            <div className="mt-8">
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:px-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Recent Applications
+                  </h3>
+                </div>
+                <div className="flex flex-col">
+                  <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                      <div className="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Name
+                              </th>
+                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Property
+                              </th>
+                              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {recentApplications.map((application) => (
+                              <tr key={application.id}>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{application.name}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{application.property}</td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                    application.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                                    application.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                                    'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                    {application.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+// const NavItem = ({ icon: Icon, title, active = false }) => (
+  
+//     href="#"
+//     className={`flex items-center px-6 py-2 mt-4 duration-200 border-l-4 ${
+//       active
+//         ? 'bg-gray-100 border-indigo-500 text-indigo-500'
+//         : 'border-transparent hover:bg-gray-100 hover:border-indigo-500'
+//     }`}
+//   >
+//     <Icon className="h-5 w-5" />
+//     <span className="mx-4">{title}</span>
+//   </a>
+// );
+
+const SummaryCard = ({ title, value, icon: Icon }) => (
+  <div className="bg-white overflow-hidden shadow rounded-lg">
+    <div className="p-5">
+      <div className="flex items-center">
+        <div className="flex-shrink-0">
+          <Icon className="h-6 w-6 text-gray-400" />
+        </div>
+        <div className="ml-5 w-0 flex-1">
+          <dl>
+            <dt className="text-sm font-medium text-gray-500 truncate">{title}</dt>
+            <dd className="text-2xl font-semibold text-gray-900">{value}</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+export default Dashboard;

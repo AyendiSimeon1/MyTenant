@@ -32,15 +32,15 @@ const userSchema = new mongoose.Schema({
   }, { timestamps: true });
   
 
-const propertySchema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  agencyId: { type: Schema.Types.ObjectId, ref: 'Agency' },
-  price: { type: String, required: true },
-  location: { type: String, required: true},
-  applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
-}, { timestamps: true });
+  const propertySchema = new Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now },
+    agencyId: { type: Schema.Types.ObjectId, ref: 'Agency' },
+    price: { type: String, required: true },
+    location: { type: String, required: true },
+    applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
+  }, { timestamps: true });
 
 
 const templateSchema = new Schema({
@@ -75,7 +75,7 @@ const referenceSchema = new Schema({
 
 const applicationSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true }, // Add propertyId to link to the property
+  propertyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Property', required: true },
   personalInfo: {
     fullName: { type: String, required: true },
     dateOfBirth: { type: Date, required: true },
@@ -83,7 +83,7 @@ const applicationSchema = new mongoose.Schema({
     maritalStatus: { type: String, enum: ['Single', 'Married', 'Divorced', 'Widowed'], required: true },
     nationality: { type: String, default: 'Nigerian' },
     stateOfOrigin: { type: String, required: true },
-    lga: { type: String, required: true }, // Local Government Area
+    lga: { type: String, required: true },
   },
   contactInfo: {
     phoneNumber: { type: String, required: true },
@@ -94,8 +94,8 @@ const applicationSchema = new mongoose.Schema({
   identificationInfo: {
     idType: { type: String, enum: ['National ID', 'Voters Card', 'Drivers License', 'International Passport'], required: true },
     idNumber: { type: String, required: true },
-    bvn: { type: String, required: true }, // Bank Verification Number
-    nin: { type: String }, // National Identification Number
+    bvn: { type: String, required: true },
+    nin: { type: String },
   },
   employmentInfo: {
     occupation: { type: String, required: true },
@@ -124,9 +124,9 @@ const applicationSchema = new mongoose.Schema({
     criminalRecord: { type: Boolean, default: false },
   },
   documents: {
-    passportPhoto: { type: String }, // URL to uploaded passport photo
-    proofOfIncome: { type: String }, // URL to uploaded document
-    idCardScan: { type: String }, // URL to uploaded ID scan
+    passportPhoto: { type: String },
+    proofOfIncome: { type: String },
+    idCardScan: { type: String },
   },
   applicationStatus: {
     type: String,
@@ -140,7 +140,7 @@ const applicationSchema = new mongoose.Schema({
   }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 const Agency = mongoose.model('Agency', agencySchema);
@@ -149,7 +149,7 @@ const Template = mongoose.model('Template', templateSchema);
 const FormSubmission = mongoose.model('FormSubmission', formSubmissionSchema);
 const Reference = mongoose.model('Reference', referenceSchema);
 const Application = mongoose.model('Application', applicationSchema);
-const Payment = mongoose.model('Payment', paymentSchema);
+
 
 module.exports = {
   User,
@@ -158,6 +158,5 @@ module.exports = {
   Template,
   FormSubmission,
   Reference,
-  Application,
-  Payment
+  Application
 };

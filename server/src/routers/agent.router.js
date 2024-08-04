@@ -1,36 +1,37 @@
 const express = require('express');
 const { upload } = require('../middlewares/uploads');
 
-const { 
-    createFormController,
+const {
     getAllApplicationsForAgent,
     updateApplicationStatus,
     applyForProperty,
-    getUsers,
     getProperties,
     getAgent,
     getProperty,
-    getPaymentsForApprovedApplications
+    getPaymentsForApprovedApplications,
+    createProperty,
+    getPropertiesByAgent,
+    getApprovedApplicationsForAgent
    
  } = require('../controllers/agent.controllers');
 
 const  agentRouter = express.Router();
 
+agentRouter.post("/create-property", createProperty);
+
+agentRouter.get("/get-approved-applications/:agentId", getApprovedApplicationsForAgent);
+
 agentRouter.post("/property-application", applyForProperty);
 
-agentRouter.post("/get-agent-property", getAllApplicationsForAgent);
+agentRouter.get("/get-agent-property/:agentId", getPropertiesByAgent);
+
+agentRouter.get("/get-agents-applications/:agentId", getAllApplicationsForAgent);
 
 agentRouter.post("/change-application-status", updateApplicationStatus)
 
-agentRouter.post('/profile',  upload.single('profilePicture'), createAgencyProfile);
+// agentRouter.post('/profile',  upload.single('profilePicture'), createAgencyProfile);
 
 agentRouter.get('/get-approved-payment', getPaymentsForApprovedApplications);
-
-
-
-// agentRouter.post("/initiate-payment", initiatePayment);
-
-agentRouter.get("/users", getUsers);
 
 // agentRouter.get("/agent/:agentId", getAgent);
 

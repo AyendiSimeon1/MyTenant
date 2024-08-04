@@ -1,8 +1,8 @@
 const https = require('https');
 require('dotenv').config;
 const path = require('path');
-const { getReceiptData, generateReceipt } = require('./receiptUtils');
-
+const { getReceiptData } = require('../crud/agent.crud');
+const { generateReceipt } = require('../controllers/agent.controllers');
 const paystack_secret_key = process.env.PAYSTACK_SECRET_KEY;
 const initiatePayment = () => {
   const { email, amount, subaccount, applicationId } = req.body;
@@ -34,7 +34,7 @@ const initiatePayment = () => {
           console.log(JSON.parse(data));
 
           if (paystackResponse.status) {
-            // Store the payment reference in the application
+          
             const updatedApplication = await Application.findByIdAndUpdate(applicationId, {
               $push: {
                 payments: {

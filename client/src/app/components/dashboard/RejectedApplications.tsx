@@ -17,13 +17,10 @@ const RejectedApplications = () => {
                 console.log(error);
             };
         }
-    }, []);
+    });
     return (
         <h1>Rejected Applications</h1>
       
-            {/* {applications.map(index, application => (
-                <h1>{application.personalInfo.fullName}</h1>
-            ))}; */}
       
     );
 };

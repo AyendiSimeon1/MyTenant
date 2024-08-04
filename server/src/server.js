@@ -25,7 +25,6 @@ const uri = "mongodb+srv://mrayendi1:ciA7C9znZpI2ynry@cluster0.i1s4gt1.mongodb.n
 
 mongoose.connect(uri, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
   connectTimeoutMS: 30000,
   socketTimeoutMS: 45000,
 })
@@ -38,7 +37,7 @@ mongoose.connect(uri, {
 
 
 
-const start = async () => {
+const start =  () => {
   try {
     console.log("Connecting to database...");
     server.listen(PORT, () => {

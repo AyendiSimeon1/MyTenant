@@ -29,9 +29,6 @@ const {
 } = require('../models/user.models');
 
 
-
-
-
 const getAgent = async (req, res) => {
   try {
     const agentId = req.params.agentId;
@@ -49,6 +46,28 @@ const getAgent = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+const getPropertiesByAgent = async (req, res) => {
+  try {
+    const { agentId } = req.params; // Assuming agentId is passed as a route parameter
+
+    if (!agentId) {
+      return res.status(400).json({ message: 'Agent ID is required' });
+    }
+
+    const properties = await Property.find({ agencyId: agentId });
+
+    if (!properties.length) {
+      return res.status(404).json({ message: 'No properties found for this agent' });
+    }
+
+    res.status(200).json({ properties });
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
+
 
 const getProperty = async (req, res) => {
   try {
@@ -68,14 +87,7 @@ const getProperty = async (req, res) => {
   }
 };
 
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching users', error });
-  }
-};
+
 
 const getProperties = async (req, res) => {
   try {
@@ -89,34 +101,25 @@ const getProperties = async (req, res) => {
 const applyForProperty = async (req, res) => {
   const data = req.body;
   try {
-  
-    const userId = '';
-    const applicationData = { ...data, userId }; 
+    const applicationData = req.body;
 
-    const newApplication = new Application(applicationData); 
-    await newApplication.save(); 
+    const newApplication = new Application(applicationData);
+    const savedApplication = await newApplication.save();
 
-    const propertyId = '6679c64b007b5426f2e173a4'; 
-    const updateProperty = await Property.findByIdAndUpdate(
-      propertyId,
-      { $push: { applications: newApplication._id } },
-      { new: true }
-    ); 
+    await Property.findByIdAndUpdate(applicationData.propertyId, {
+      $push: { applications: savedApplication._id }
+    });
 
-    if (!updateProperty) {
-      return res.status(404).json({ message: 'Property not found' }); 
-    }
-
-    res.status(201).json({ message: 'Application submitted successfully', application: newApplication });
+    res.status(201).json(savedApplication);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Error submitting application', error });
+    console.error('Error creating application:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
 
 const getAllApplicationsForAgent = async (req, res) => {
   try {
-    const agentId = ''; 
+    const agentId = '667448bb3468267bcb6c033b'; 
 
     const properties = await Property.find({ agencyId: agentId }).select('_id');
 
@@ -135,37 +138,37 @@ const getAllApplicationsForAgent = async (req, res) => {
   }
 };
 
-const updateApplicationStatus = async (req, res) => {
-  try {
-    const { applicationId, status } = req.body; 
+// const updateApplicationStatus = async (req, res) => {
+//   try {
+//     const { applicationId, status } = req.body; 
 
-    const validStatuses = ['Approved', 'Rejected'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
-    }
+//     const validStatuses = ['Approved', 'Rejected'];
+//     if (!validStatuses.includes(status)) {
+//       return res.status(400).json({ message: 'Invalid status' });
+//     }
 
-    const application = await Application.findByIdAndUpdate(
-      applicationId,
-      { applicationStatus: status, updatedAt: Date.now() },
-      { new: true }
-    );
+//     const application = await Application.findByIdAndUpdate(
+//       applicationId,
+//       { applicationStatus: status, updatedAt: Date.now() },
+//       { new: true }
+//     );
 
-    if (!application) {
-      return res.status(404).json({ message: 'Application not found' });
-    }
+//     if (!application) {
+//       return res.status(404).json({ message: 'Application not found' });
+//     }
 
-    res.status(200).json({ message: `Application ${status.toLowerCase()} successfully`, application });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Error updating application status', error });
-  }
-};
+//     res.status(200).json({ message: `Application ${status.toLowerCase()} successfully`, application });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: 'Error updating application status', error });
+//   }
+// };
 
 const getApprovedApplicationsForAgent = async (req, res) => {
   try {
-    const agentId = '';
+    const agentId = req.query;
 
-    const properties = await Property.find({ agentId: agenId}).select('_id');
+    const properties = await Property.find({ agentId: agentId }).select('_id');
 
     if (!properties.length) {
       return res.status(404).json({ message: 'No properties found for this agent'});
@@ -237,7 +240,32 @@ const getPaymentsForApprovedApplications = async (req, res) => {
   }
 };
 
-const generateReciept = (recieptData, filepath) => {
+const createProperty = async (req, res) => {
+  try {
+    const { title, description, agencyId, price, location, applications } = req.body;
+
+    if (!title || !description || !price || !location) {
+      return res.status(400).json({ message: 'All required fields must be provided' });
+    }
+
+    const newProperty = new Property({
+      title,
+      description,
+      agencyId,
+      price,
+      location,
+      applications
+    });
+
+    const savedProperty = await newProperty.save();
+    res.status(201).json(savedProperty);
+  } catch (error) {
+    console.error('Error creating property:', error);
+    res.status(500).json({ message: 'Internal Server Error', error });
+  }
+};
+
+const generateReceipt = (recieptData, filepath) => {
   const doc = new PDFDocument();
   doc.pipe(fs.createWriteStream(filePath));
   doc.fontSize(25).text('Invoice', { align: 'center'});
@@ -286,9 +314,11 @@ const getReciept = (req, res) => {
 
 
 module.exports = { 
+                    createProperty,
+                    getPropertiesByAgent,
                     getAllApplicationsForAgent,
                     updateApplicationStatus,
-                    getUsers,
+                    generateReceipt,
                     getProperties,
                     getProperty,
                     getAgent,

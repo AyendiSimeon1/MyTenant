@@ -12,17 +12,17 @@ const ApprovedApplications = () => {
 
     useEffect(() => {
 
-        const fetchApplications = () => {
-            
+        const fetchApplications = async () => {
+            const agentId = '494949';
             try {
-                const response = await axios.get('127.0.0.1:3000/applications/approved-applications');
+                const response = await axios.get(`127.0.0.1:3001/applications/approved-applications/${agentId}`);
                 setApplications(response.data);
             } catch (error) {
                 console.log(error);
-            };
+            }
         }
         fetchApplications();
-    } []);
+    });
     return (
         <h1>Approved Application</h1>
       
