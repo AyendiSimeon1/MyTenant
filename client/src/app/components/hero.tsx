@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket, faLightbulb } from '@fortawesome/free-solid-svg-icons';
-import 'tailwindcss/tailwind.css';
+
 
 const Hero: React.FC = () => {
   useEffect(() => {

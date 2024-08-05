@@ -8,7 +8,7 @@ import Tips from './components/tips';
 import Footer from './components/footer';
 import type { AppProps } from 'next/app';
 import { UserProvider } from '../userContext';
-import 'tailwindcss/tailwind.css';
+
 
 const Home = () => {
   return (

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from 'react';
-import 'tailwindcss/tailwind.css';
+
 
 const Features: React.FC = () => {
   useEffect(() => {
