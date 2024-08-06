@@ -1,5 +1,5 @@
 "use client";
-
+// import 'tailwindcss/tailwind.css';
 import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket, faLightbulb } from '@fortawesome/free-solid-svg-icons';

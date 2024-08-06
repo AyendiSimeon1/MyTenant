@@ -1,4 +1,4 @@
-// components/Navbar.js
+// import 'tailwindcss/tailwind.css';
 import Link from 'next/link';
 
 const Navbar = () => {
