@@ -64,7 +64,7 @@ const PropertyList: React.FC = () => {
     useEffect(() => {
       const fetchProperties = async () => {
         try {
-          const response = await axios.get<Property[]>('http://127.0.0.1:3001/api/v1/agents/properties');
+          const response = await axios.get<Property[]>('https://mytenant.onrender.com/api/v1/agents/properties');
           setProperties(response.data);
           console.log(response.data);
           console.log("hello");
