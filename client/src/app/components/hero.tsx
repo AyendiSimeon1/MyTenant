@@ -21,16 +21,16 @@ const Hero: React.FC = () => {
   }, []);
 
   return (
-    <section className="bg-gray-50 py-20">
+    <section className="bg-orange-500 py-20">
       <div className="container mx-auto text-center px-4">
         <h1 className="text-5xl md:text-6xl font-bold text-darkBlue animate-on-scroll">
-          Simplify Your Tenant Onboarding Process
+        Find Your Perfect Home with Ease
         </h1>
         <p className="text-2xl text-gray-600 mt-4 animate-on-scroll">
-          Seamlessly manage tenant applications, form submissions, and payments with our all-in-one platform.
+          Connecting tenants with the best properties, all in one place.
         </p>
         <div className="mt-8 flex justify-center space-x-4">
-          <button className="bg-orange text-white px-6 py-3 rounded-full hover:bg-darkBlue transition duration-300 transform hover:scale-105 animate-on-scroll">
+          <button className="bg-orange-500 text-white border border-white px-6 py-3 rounded-full hover:bg-darkBlue transition duration-300 transform hover:scale-105 animate-on-scroll">
             <FontAwesomeIcon icon={faRocket} className="mr-2" />
             Get Started
           </button>

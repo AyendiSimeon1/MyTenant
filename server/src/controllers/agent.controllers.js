@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const now = new Date();
 require('dotenv').config(); 
 const request = require('request');
+
 const { createForm, 
         getAllApplication, 
         updateApplications, 
@@ -28,6 +29,19 @@ const {
   Application,
 
 } = require('../models/user.models');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+console.log("Hello");
+console.log(process.env.CLOUDINARY_CLOUD_NAME);
+
+
 
 
 const getAgent = async (req, res) => {
@@ -89,15 +103,29 @@ const getProperty = async (req, res) => {
 };
 
 
-
 const getProperties = async (req, res) => {
   try {
     const properties = await Property.find();
-    res.status(200).json(properties);
+
+    const propertiesWithImages = properties.map(property => {
+      let imageUrl = null;
+      if (property.image && property.image.data) {
+        const base64Image = property.image.data.toString('base64');
+        imageUrl = `data:${property.image.contentType};base64,${base64Image}`;
+      }
+      console.log('imageUrl:', imageUrl); // Add this line
+      return {
+        ...property.toObject(),
+        imageUrl, // Add imageUrl to the property object
+      };
+    });
+
+    res.status(200).json(propertiesWithImages);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching properties', error });
   }
 };
+
 
 const applyForProperty = async (req, res) => {
   const data = req.body;
@@ -139,31 +167,6 @@ const getAllApplicationsForAgent = async (req, res) => {
   }
 };
 
-// const updateApplicationStatus = async (req, res) => {
-//   try {
-//     const { applicationId, status } = req.body; 
-
-//     const validStatuses = ['Approved', 'Rejected'];
-//     if (!validStatuses.includes(status)) {
-//       return res.status(400).json({ message: 'Invalid status' });
-//     }
-
-//     const application = await Application.findByIdAndUpdate(
-//       applicationId,
-//       { applicationStatus: status, updatedAt: Date.now() },
-//       { new: true }
-//     );
-
-//     if (!application) {
-//       return res.status(404).json({ message: 'Application not found' });
-//     }
-
-//     res.status(200).json({ message: `Application ${status.toLowerCase()} successfully`, application });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: 'Error updating application status', error });
-//   }
-// };
 
 const getApprovedApplicationsForAgent = async (req, res) => {
   try {
@@ -242,30 +245,65 @@ const getPaymentsForApprovedApplications = async (req, res) => {
 };
 
 const createProperty = async (req, res) => {
-  try {
-    const { title, description, agencyId, price, location, applications } = req.body;
-
-    if (!title || !description || !price || !location) {
-      return res.status(400).json({ message: 'All required fields must be provided' });
+  const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'uploads',
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif']
     }
+  });
 
-    const newProperty = new Property({
-      title,
-      description,
-      agencyId,
-      price,
-      location,
-      applications
+  const upload = multer({ storage: storage });
+
+  try {
+    const uploadMiddleware = upload.single('image');
+
+    // Execute the upload middleware
+    uploadMiddleware(req, res, async (err) => {
+      if (err) {
+        console.error('Error during file upload:', err);
+        return res.status(400).json({ message: 'Error uploading image', error: err });
+      }
+
+      console.log('Request body after upload middleware:', req.body);
+      console.log('Request file after upload middleware:', req.file);
+
+      if (!req.file) {
+        return res.status(400).json({ success: false, error: 'No file uploaded' });
+      }
+
+      const { originalname, path, filename } = req.file;
+      const { title, description, agencyId, price, location, applications } = req.body;
+
+      // Ensure required fields are provided
+      if (!title || !description || !price || !location) {
+        return res.status(400).json({ message: 'All required fields must be provided' });
+      }
+
+      // Construct the new property object
+      const newProperty = new Property({
+        title,
+        description,
+        agencyId,
+        price,
+        location,
+        applications,
+        image: {
+          filename: originalname,
+          url: path,
+          publicId: filename
+        }
+      });
+
+      // Save the new property to the database
+      const savedProperty = await newProperty.save();
+      res.status(201).json(savedProperty);
     });
-
-    const savedProperty = await newProperty.save();
-    res.status(201).json(savedProperty);
   } catch (error) {
     console.error('Error creating property:', error);
     res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
-
 const generateReceipt = (recieptData, filepath) => {
   const doc = new PDFDocument();
   doc.pipe(fs.createWriteStream(filePath));

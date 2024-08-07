@@ -39,6 +39,13 @@ const userSchema = new mongoose.Schema({
     agencyId: { type: Schema.Types.ObjectId, ref: 'Agency' },
     price: { type: String, required: true },
     location: { type: String, required: true },
+    bedrooms: { type: String },
+    image: {
+      filename: String,
+      url: String,
+      publicId: String
+
+    }, 
     applications: [{ type: Schema.Types.ObjectId, ref: 'Application' }]
   }, { timestamps: true });
 
