@@ -1,5 +1,6 @@
 "use client";
 // import 'tailwindcss/tailwind.css';
+import Link from 'next/link';
 import { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket, faLightbulb } from '@fortawesome/free-solid-svg-icons';
@@ -30,14 +31,18 @@ const Hero: React.FC = () => {
           Connecting tenants with the best properties, all in one place.
         </p>
         <div className="mt-8 flex justify-center space-x-4">
-          <button className="bg-orange-500 text-white border border-white px-6 py-3 rounded-full hover:bg-darkBlue transition duration-300 transform hover:scale-105 animate-on-scroll">
-            <FontAwesomeIcon icon={faRocket} className="mr-2" />
-            Get Started
-          </button>
-          <button className="bg-white text-orange border border-orange px-6 py-3 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105 animate-on-scroll">
-            <FontAwesomeIcon icon={faLightbulb} className="mr-2" />
-            Dashboard
-          </button>
+          <Link href="/login" legacyBehavior>
+            <button className="bg-orange-500 text-white border border-white px-6 py-3 rounded-full hover:bg-darkBlue transition duration-300 transform hover:scale-105 animate-on-scroll">
+              <FontAwesomeIcon icon={faRocket} className="mr-2" />
+              Get Started
+            </button>
+          </Link>
+          <Link href="/login" legacyBehavior>
+            <button className="bg-white text-orange border border-orange px-6 py-3 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105 animate-on-scroll">
+              <FontAwesomeIcon icon={faLightbulb} className="mr-2" />
+              Dashboard
+            </button>
+          </Link>
         </div>
       </div>
     </section>

@@ -102,7 +102,6 @@ const getProperty = async (req, res) => {
   }
 };
 
-
 const getProperties = async (req, res) => {
   try {
     const properties = await Property.find();
@@ -113,18 +112,30 @@ const getProperties = async (req, res) => {
         const base64Image = property.image.data.toString('base64');
         imageUrl = `data:${property.image.contentType};base64,${base64Image}`;
       }
-      console.log('imageUrl:', imageUrl); // Add this line
+      console.log('imageUrl:', imageUrl);
       return {
         ...property.toObject(),
-        imageUrl, // Add imageUrl to the property object
+        imageUrl,
       };
     });
 
-    res.status(200).json(propertiesWithImages);
+    // Make copies of propertiesWithImages for independent sorting
+    const latestProperties = [...propertiesWithImages].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const trendingProperties = [...propertiesWithImages].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+
+    // Limit the number of properties
+    const latestPropertiesLimited = latestProperties.slice(0, 10);
+    const trendingPropertiesLimited = trendingProperties.slice(0, 10);
+
+    res.status(200).json({
+      latest: latestPropertiesLimited,
+      trending: trendingPropertiesLimited,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching properties', error });
   }
 };
+
 
 
 const applyForProperty = async (req, res) => {
