@@ -5,6 +5,8 @@ import "tailwindcss/tailwind.css";
 import "tailwindcss";
 import { UserProvider } from '../userContext';
 import { ReactNode } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '../src/store';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +19,9 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="en">
       <body>
-        <UserProvider>
+        <Provider store={store}>
         <body className={inter.className}>{children}</body>
-        </UserProvider>
+        </Provider>
       </body>
     </html>
   );

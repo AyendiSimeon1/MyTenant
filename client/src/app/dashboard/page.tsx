@@ -1,6 +1,7 @@
 // pages/dashboard.js
 "use client";
 import React, { useState } from 'react';
+import withAuth from '../withAuth';
 import {
   HomeIcon,
   UserGroupIcon,
@@ -221,4 +222,4 @@ const SummaryCard = () => (
   </div>
 );
 
-export default Dashboard;
+export default withAuth(Dashboard);

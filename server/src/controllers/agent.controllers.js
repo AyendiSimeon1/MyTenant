@@ -119,11 +119,10 @@ const getProperties = async (req, res) => {
       };
     });
 
-    // Make copies of propertiesWithImages for independent sorting
     const latestProperties = [...propertiesWithImages].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const trendingProperties = [...propertiesWithImages].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-    // Limit the number of properties
+
     const latestPropertiesLimited = latestProperties.slice(0, 10);
     const trendingPropertiesLimited = trendingProperties.slice(0, 10);
 

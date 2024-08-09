@@ -6,6 +6,8 @@ import { useUser } from '../../../userContext';
 import { ClipLoader } from 'react-spinners';
 import Link from 'next/link';
 import { FiMail, FiLock } from 'react-icons/fi';
+import { useAppDispatch, useAppSelector } from '../../../store'; // Adjust the path as necessary
+import { login } from '../../../store/slices/authSlice';
 
 interface LoginFormData {
   email: string;
@@ -14,6 +16,8 @@ interface LoginFormData {
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
+  const dispath = useAppDispatch();
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const [token, setToken] = useState<string | null>(null);
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
@@ -47,8 +51,7 @@ const LoginForm: React.FC = () => {
       });
 
       console.log('User logged in successfully:', response.data);
-      setUser(response.data.user);
-      setAgency(response.data.agency);
+      dispath(login(response.data));
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);

@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faUser } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-
+import { useDispatch, useAppSelector } = from '../../../store';
+import { signup } from '../../../store/slices/authSlice';
 interface FormData {
   email: string;
   firstName: string;
@@ -14,6 +15,8 @@ interface FormData {
 
 const SignupForm: React.FC = () => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth); 
   const [formData, setFormData] = useState<FormData>({
     email: '',
     firstName: '',
@@ -23,6 +26,7 @@ const SignupForm: React.FC = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,6 +39,7 @@ const SignupForm: React.FC = () => {
     try {
       const response = await axios.post('/api/auth/signup', formData);
       console.log('User signed up successfully:', response.data);
+      dispatch(signup(response.data));
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);

@@ -1,6 +1,7 @@
 import "./globals.css";
 import "tailwindcss/tailwind.css";
 import PropertyCard from './components/landingPage/PropertyCard';
+import TrendingPropertyList from './components/landingPage/TrendingProperty';
 import Navbar from './components/header';
 import Hero from './components/hero';
 import AboutUs from './components/aboutUs';
@@ -17,7 +18,7 @@ const Home = () => {
       <Hero />
       <OrganizeWork />
       <PropertyCard />
-      <Tools />
+      <TrendingPropertyList />
       <Tips />
       <AboutUs />
       <Footer />
